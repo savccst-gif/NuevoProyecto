@@ -1,8 +1,18 @@
-import React, { useState } from 'react';
-import { Search, MapPin, Building2, User, FileText, ChevronRight, FileDigit, CalendarClock } from 'lucide-react';
+import React, { useState, useContext } from 'react';
+import { RouterContext } from '../../context/AppContexts';
+import { Search, MapPin, Building2, User, FileText, ChevronRight, FileDigit, CalendarClock, Globe, Car, Heart, Clock, Wifi, ArrowRight } from 'lucide-react';
 
 export function HomePage({ onOpenModal }) {
+  const { setPage, setGlobalSearch } = useContext(RouterContext);
   const [query, setQuery] = useState('');
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (query.trim()) {
+      setGlobalSearch(query);
+      setPage('tramites');
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 animate-in fade-in duration-300">
@@ -13,7 +23,7 @@ export function HomePage({ onOpenModal }) {
         <p className="text-lg text-slate-500 mb-8 max-w-2xl mx-auto">
           Obtén tus certificados, renueva tu cédula o revisa el estado de tus solicitudes desde la comodidad de tu hogar.
         </p>
-        <div className="relative max-w-xl mx-auto group">
+        <form onSubmit={handleSearch} className="relative max-w-xl mx-auto group">
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
             <Search className="h-5 w-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
           </div>
@@ -24,28 +34,86 @@ export function HomePage({ onOpenModal }) {
             value={query} 
             onChange={(e) => setQuery(e.target.value)} 
           />
-          <button className="absolute inset-y-2 right-2 bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl font-medium transition-colors">
+          <button type="submit" className="absolute inset-y-2 right-2 bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-xl font-medium transition-colors">
             Buscar
           </button>
-        </div>
+        </form>
       </div>
 
-      <div className="mb-12">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2"><FileText size={20} className="text-blue-600" /> Trámites Frecuentes</h2>
-          <button className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">Ver todos <ChevronRight size={16} /></button>
+      <div className="mb-14">
+        <div className="flex items-end justify-between mb-8">
+          <div>
+            <p className="text-blue-600 font-bold text-xs tracking-widest uppercase mb-2">Lo más usado</p>
+            <h2 className="text-2xl md:text-3xl font-bold text-slate-800">Trámites frecuentes</h2>
+          </div>
+          <button 
+            onClick={() => setPage('tramites')}
+            className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 transition-colors"
+          >
+            Ver todos <ChevronRight size={16} />
+          </button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {[
-            { title: 'Certificado de Nacimiento', type: 'Gratis en línea', icon: <User size={24} />, bg: "bg-blue-50", color: "text-blue-600" },
-            { title: 'Certificado de Antecedentes', type: 'Requiere ClaveÚnica', icon: <FileText size={24} />, bg: "bg-violet-50", color: "text-violet-600" },
-            { title: 'Renovar cédula', type: 'Agendar hora', icon: <User size={24} />, bg: "bg-emerald-50", color: "text-emerald-600" },
+            { 
+              title: 'Certificado de Nacimiento', 
+              desc: 'Obtén tu certificado en minutos para trámites escolares, legales y más.', 
+              icon: <FileText size={24} strokeWidth={1.5} />, 
+              iconBg: "bg-blue-50", iconColor: "text-blue-600",
+              tag: "Más solicitado", tagBg: "bg-amber-100/60", tagColor: "text-amber-700",
+              time: "~5 min", 
+              modality: "100% online", modalityIcon: <Wifi size={14} />, modalityBg: "bg-emerald-50", modalityColor: "text-emerald-600"
+            },
+            { 
+              title: 'Cédula de Identidad', 
+              desc: 'Solicita o renueva tu cédula. La retiras en la sucursal de tu elección.', 
+              icon: <Globe size={24} strokeWidth={1.5} />, 
+              iconBg: "bg-violet-50", iconColor: "text-violet-600",
+              time: "5-7 días hábiles", 
+              modality: "Online + Sucursal", modalityBg: "bg-purple-50", modalityColor: "text-purple-600"
+            },
+            { 
+              title: 'Trámites de Vehículos', 
+              desc: 'Transferencias, inscripciones y certificados del Registro de Vehículos Motorizados.', 
+              icon: <Car size={24} strokeWidth={1.5} />, 
+              iconBg: "bg-emerald-50", iconColor: "text-emerald-600",
+              time: "~10 min", 
+              modality: "100% online", modalityIcon: <Wifi size={14} />, modalityBg: "bg-emerald-50", modalityColor: "text-emerald-600"
+            },
+            { 
+              title: 'Certificado de Matrimonio', 
+              desc: 'Descarga tu certificado al instante con validez legal.', 
+              icon: <Heart size={24} strokeWidth={1.5} />, 
+              iconBg: "bg-rose-50", iconColor: "text-rose-600",
+              tag: "Nuevo", tagBg: "bg-amber-100/60", tagColor: "text-amber-700",
+              time: "~3 min", 
+              modality: "100% online", modalityIcon: <Wifi size={14} />, modalityBg: "bg-emerald-50", modalityColor: "text-emerald-600"
+            },
           ].map((s) => (
-            <button key={s.title} onClick={() => onOpenModal(s.title)} className="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:border-blue-100 transition-all text-left group flex items-start gap-4">
-              <div className={`p-3 rounded-xl ${s.bg} ${s.color} group-hover:scale-110 transition-transform`}>{s.icon}</div>
-              <div>
-                <h3 className="font-bold text-slate-800 text-base mb-1 group-hover:text-blue-600 transition-colors">{s.title}</h3>
-                <p className="text-sm text-slate-500 font-medium">{s.type}</p>
+            <button key={s.title} onClick={() => onOpenModal(s.title)} className="bg-white p-7 rounded-[24px] border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:border-blue-100 transition-all text-left group flex flex-col relative h-full">
+              {s.tag && (
+                <span className={`absolute top-6 right-6 px-3 py-1 rounded-full text-[11px] font-bold ${s.tagBg} ${s.tagColor}`}>
+                  {s.tag}
+                </span>
+              )}
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${s.iconBg} ${s.iconColor} group-hover:scale-105 transition-transform mb-6`}>
+                {s.icon}
+              </div>
+              <h3 className="font-semibold text-slate-800 text-[18px] mb-2 group-hover:text-blue-600 transition-colors">{s.title}</h3>
+              <p className="text-[15px] text-slate-500 mb-8 leading-relaxed flex-1">{s.desc}</p>
+              
+              <div className="flex items-center justify-between w-full mt-auto">
+                <div className="flex items-center gap-2 text-[13px] text-slate-400 font-medium">
+                  <Clock size={16} />
+                  <span>{s.time}</span>
+                </div>
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold ${s.modalityBg} ${s.modalityColor} transition-colors relative overflow-hidden`}>
+                  {s.modalityIcon}
+                  <span>{s.modality}</span>
+                  {s.modality === '100% online' && (
+                    <ArrowRight size={14} className="opacity-0 -ml-4 group-hover:opacity-100 group-hover:ml-0 group-hover:text-blue-600 transition-all duration-300 absolute -right-6 group-hover:relative group-hover:right-0" />
+                  )}
+                </div>
               </div>
             </button>
           ))}

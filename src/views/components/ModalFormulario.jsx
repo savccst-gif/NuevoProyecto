@@ -1,11 +1,27 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { X } from 'lucide-react';
+import { CartContext } from '../../context/AppContexts';
 
-export function ModalFormulario({ type, onClose, onSubmit }) {
+export function ModalFormulario({ type, onClose }) {
+  const { addToCart } = useContext(CartContext);
   const isFolio = type === 'folio';
   const isCedula = type === 'Cédula de Identidad' || type === 'Renovar cédula' || type === 'Cédula';
   const title = isFolio ? "Agregar Trámite al Seguimiento" : isCedula ? "Cédula de Identidad" : `Solicitar ${type}`;
   const [cedulaOption, setCedulaOption] = useState('agendar');
+
+  const handleSubmit = () => {
+    if (!isFolio && !(isCedula && cedulaOption === 'agendar')) {
+      addToCart({
+        id: Math.random().toString(36).substr(2, 9),
+        name: type,
+        type: isCedula ? "Reimpresión" : "Certificado",
+        price: 0,
+        iconBg: "bg-blue-50",
+        iconColor: "text-blue-600"
+      });
+    }
+    onClose();
+  };
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -84,7 +100,7 @@ export function ModalFormulario({ type, onClose, onSubmit }) {
         </div>
         <div className="px-6 py-4 border-t border-slate-100 bg-slate-50 flex justify-end gap-3">
           <button onClick={onClose} className="px-5 py-2.5 text-sm font-bold text-slate-600 hover:bg-slate-200 rounded-xl transition-colors">Cancelar</button>
-          <button onClick={() => { onSubmit(); onClose(); }} className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg rounded-xl transition-all">{isFolio ? 'Agregar Folio' : isCedula && cedulaOption === 'agendar' ? 'Buscar Disponibilidad' : 'Confirmar'}</button>
+          <button onClick={handleSubmit} className="px-5 py-2.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 shadow-md hover:shadow-lg rounded-xl transition-all">{isFolio ? 'Agregar Folio' : isCedula && cedulaOption === 'agendar' ? 'Buscar Disponibilidad' : 'Confirmar'}</button>
         </div>
       </div>
     </div>

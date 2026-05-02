@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RouterContext, AccessibilityProvider } from './context/AppContexts';
+import { RouterContext, AccessibilityProvider, CartProvider } from './context/AppContexts';
 import { Navbar } from './views/components/Navbar';
 import { CarroCertificados } from './views/components/CarroCertificados';
 import { ModalFormulario } from './views/components/ModalFormulario';
@@ -13,23 +13,18 @@ import { AyudaPage } from './views/pages/AyudaPage';
 
 function PortalContent() {
   const [currentPage, setCurrentPage] = useState('home');
-  const [cartCount, setCartCount] = useState(0);
+  const [globalSearch, setGlobalSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(null);
   const [loginOpen, setLoginOpen] = useState(false);
 
   const handleOpenModal = (type) => setModalOpen(type);
   const handleCloseModal = () => setModalOpen(null);
-  const handleSubmit = () => setCartCount(c => c + 1);
 
   return (
-    <RouterContext.Provider value={{ currentPage, setPage: setCurrentPage }}>
+    <RouterContext.Provider value={{ currentPage, setPage: setCurrentPage, globalSearch, setGlobalSearch }}>
       <div className="min-h-screen flex flex-col">
         <ReadingAssistant />
-        <Navbar 
-          cartCount={cartCount} 
-          onCartClick={() => {}} 
-          onLoginClick={() => setLoginOpen(true)} 
-        />
+        <Navbar onLoginClick={() => setLoginOpen(true)} />
         
         <main className="flex-1 bg-slate-50/50 relative">
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -48,7 +43,7 @@ function PortalContent() {
         <CarroCertificados />
         <AccessibilityPanel />
         
-        {modalOpen && <ModalFormulario type={modalOpen} onClose={handleCloseModal} onSubmit={handleSubmit} />}
+        {modalOpen && <ModalFormulario type={modalOpen} onClose={handleCloseModal} />}
         {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} onSubmit={() => {}} />}
       </div>
     </RouterContext.Provider>
@@ -58,7 +53,9 @@ function PortalContent() {
 function App() {
   return (
     <AccessibilityProvider>
-      <PortalContent />
+      <CartProvider>
+        <PortalContent />
+      </CartProvider>
     </AccessibilityProvider>
   );
 }

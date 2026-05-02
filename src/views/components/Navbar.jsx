@@ -1,11 +1,12 @@
 import React, { useState, useContext } from 'react';
 import { Phone, Globe, User, Bell, Package, ShoppingCart, Menu, X } from 'lucide-react';
-import { RouterContext } from '../../context/AppContexts';
+import { RouterContext, CartContext } from '../../context/AppContexts';
 
-export function Navbar({ cartCount, onCartClick, onLoginClick }) {
+export function Navbar({ onLoginClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const { setPage, currentPage } = useContext(RouterContext);
+  const { totalItems, toggleCart } = useContext(CartContext);
 
   const links = [
     { label: "Inicio", id: "home" }, 
@@ -61,9 +62,9 @@ export function Navbar({ cartCount, onCartClick, onLoginClick }) {
               )}
             </div>
 
-            <button onClick={onCartClick} className="relative flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
+            <button onClick={toggleCart} className="relative flex items-center gap-2 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors">
               <ShoppingCart size={15} /> <span className="hidden sm:block">Mi carro</span>
-              {cartCount > 0 && <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">{cartCount}</span>}
+              {totalItems > 0 && <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">{totalItems}</span>}
             </button>
             <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 text-slate-600">{menuOpen ? <X size={20} /> : <Menu size={20} />}</button>
           </div>
