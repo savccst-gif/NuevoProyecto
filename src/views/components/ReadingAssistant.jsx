@@ -17,7 +17,7 @@ export function ReadingAssistant() {
 
     const readElement = (target) => {
       if (!target) return;
-      
+
       const readable = target.closest ? target.closest('p, span, h1, h2, h3, h4, a, li, label, button') : null;
 
       if (readable) {
@@ -28,15 +28,15 @@ export function ReadingAssistant() {
 
         if (synth.speaking) synth.cancel();
         currentElement = readable;
-        
+
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'es-CL';
         utterance.rate = 1.0;
-        
+
         utterance.onend = () => {
-            if (currentElement === readable) {
-                currentElement = null;
-            }
+          if (currentElement === readable) {
+            currentElement = null;
+          }
         };
 
         currentUtteranceRef.current = utterance;
@@ -74,7 +74,7 @@ export function ReadingAssistant() {
     const handleTouchEnd = () => {
       setTimeout(() => { isTouch = false; }, 500);
     };
-    
+
     const handleClick = (e) => {
       readElement(e.target);
     };
