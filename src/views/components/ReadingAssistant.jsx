@@ -17,18 +17,24 @@ export function ReadingAssistant() {
 
     const readElement = (target) => {
       if (!target) return;
-      if (target === currentElement) return;
+      
+      const readable = target.closest ? target.closest('p, span, h1, h2, h3, h4, a, li, label, button') : null;
 
-      if (['P', 'SPAN', 'H1', 'H2', 'H3', 'H4', 'A', 'LI', 'LABEL', 'BUTTON'].includes(target.tagName) && target.innerText.trim()) {
+      if (readable) {
+        if (readable === currentElement) return;
+
+        const text = readable.innerText?.trim() || readable.textContent?.trim();
+        if (!text) return;
+
         if (synth.speaking) synth.cancel();
-        currentElement = target;
-        const text = target.innerText;
+        currentElement = readable;
+        
         const utterance = new SpeechSynthesisUtterance(text);
         utterance.lang = 'es-CL';
         utterance.rate = 1.0;
         
         utterance.onend = () => {
-            if (currentElement === target) {
+            if (currentElement === readable) {
                 currentElement = null;
             }
         };
@@ -66,9 +72,11 @@ export function ReadingAssistant() {
     };
 
     const handleTouchEnd = () => {
-      if (synth.speaking) synth.cancel();
-      currentElement = null;
       setTimeout(() => { isTouch = false; }, 500);
+    };
+    
+    const handleClick = (e) => {
+      readElement(e.target);
     };
 
     document.body.addEventListener('mouseover', handleMouseOver);
@@ -77,6 +85,7 @@ export function ReadingAssistant() {
     document.body.addEventListener('touchmove', handleTouchMove, { passive: true });
     document.body.addEventListener('touchend', handleTouchEnd, { passive: true });
     document.body.addEventListener('touchcancel', handleTouchEnd, { passive: true });
+    document.body.addEventListener('click', handleClick, { passive: true });
 
     return () => {
       document.body.removeEventListener('mouseover', handleMouseOver);
@@ -85,6 +94,7 @@ export function ReadingAssistant() {
       document.body.removeEventListener('touchmove', handleTouchMove);
       document.body.removeEventListener('touchend', handleTouchEnd);
       document.body.removeEventListener('touchcancel', handleTouchEnd);
+      document.body.removeEventListener('click', handleClick);
       if (synth.speaking) synth.cancel();
     };
   }, [readingMode]);
