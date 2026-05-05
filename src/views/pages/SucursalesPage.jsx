@@ -52,7 +52,7 @@ export function SucursalesPage() {
                 <div key={idx} onClick={() => setSelectedSucursal(suc)} className={`bg-white p-5 rounded-2xl border shadow-sm cursor-pointer transition-colors ${selectedSucursal?.lat === suc.lat && selectedSucursal?.lon === suc.lon ? 'border-blue-500 ring-2 ring-blue-500/20 bg-blue-50/30' : 'border-slate-100 hover:border-blue-300'}`}>
                   <h3 className="font-bold text-slate-800 text-sm mb-1">{suc.nombre}</h3>
                   <p className="text-xs text-slate-500 flex items-start gap-1.5 mb-2 line-clamp-2" title={suc.direccion}><MapPin size={12} className="flex-shrink-0 mt-0.5"/> {suc.direccion}</p>
-                  <p className="text-[11px] text-emerald-600 font-medium flex items-center gap-1.5"><Clock size={12} className="flex-shrink-0"/> {suc.horario}</p>
+                  <p className="text-[0.6875rem] text-emerald-600 font-medium flex items-center gap-1.5"><Clock size={12} className="flex-shrink-0"/> {suc.horario}</p>
                 </div>
               ))
             ) : (

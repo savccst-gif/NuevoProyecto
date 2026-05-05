@@ -92,22 +92,22 @@ export function HomePage({ onOpenModal }) {
           ].map((s) => (
             <button key={s.title} onClick={() => onOpenModal(s.title)} className="bg-white p-7 rounded-[24px] border border-slate-100 shadow-[0_2px_10px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.08)] hover:border-blue-100 transition-all text-left group flex flex-col relative h-full">
               {s.tag && (
-                <span className={`absolute top-6 right-6 px-3 py-1 rounded-full text-[11px] font-bold ${s.tagBg} ${s.tagColor}`}>
+                <span className={`absolute top-6 right-6 px-3 py-1 rounded-full text-[0.6875rem] font-bold ${s.tagBg} ${s.tagColor}`}>
                   {s.tag}
                 </span>
               )}
               <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${s.iconBg} ${s.iconColor} group-hover:scale-105 transition-transform mb-6`}>
                 {s.icon}
               </div>
-              <h3 className="font-semibold text-slate-800 text-[18px] mb-2 group-hover:text-blue-600 transition-colors">{s.title}</h3>
-              <p className="text-[15px] text-slate-500 mb-8 leading-relaxed flex-1">{s.desc}</p>
+              <h3 className="font-semibold text-slate-800 text-lg mb-2 group-hover:text-blue-600 transition-colors">{s.title}</h3>
+              <p className="text-[0.9375rem] text-slate-500 mb-8 leading-relaxed flex-1">{s.desc}</p>
               
               <div className="flex items-center justify-between w-full mt-auto">
-                <div className="flex items-center gap-2 text-[13px] text-slate-400 font-medium">
+                <div className="flex items-center gap-2 text-[0.8125rem] text-slate-400 font-medium">
                   <Clock size={16} />
                   <span>{s.time}</span>
                 </div>
-                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[12px] font-semibold ${s.modalityBg} ${s.modalityColor} transition-colors relative overflow-hidden`}>
+                <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold ${s.modalityBg} ${s.modalityColor} transition-colors relative overflow-hidden`}>
                   {s.modalityIcon}
                   <span>{s.modality}</span>
                   {s.modality === '100% online' && (
@@ -143,8 +143,8 @@ export function HomePage({ onOpenModal }) {
                     </div>
                   </div>
                   <div className="text-right">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-100 text-amber-700">En fabricación</span>
-                    <p className="text-[10px] text-slate-400 mt-1">Ingresado hace 2 días</p>
+                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.625rem] font-bold bg-amber-100 text-amber-700">En fabricación</span>
+                    <p className="text-[0.625rem] text-slate-400 mt-1">Ingresado hace 2 días</p>
                   </div>
                 </div>
               </div>

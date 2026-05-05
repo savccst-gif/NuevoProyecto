@@ -55,7 +55,7 @@ export function Navbar({ onLoginClick }) {
                     <div>
                       <p className="font-semibold text-slate-800">Tu Cédula está lista</p>
                       <p className="text-xs text-slate-600 mt-0.5">Ya puedes retirarla en Sucursal Providencia.</p>
-                      <p className="text-[10px] text-blue-500 mt-1">Hace 2 horas</p>
+                      <p className="text-[0.625rem] text-blue-500 mt-1">Hace 2 horas</p>
                     </div>
                   </div>
                 </div>
