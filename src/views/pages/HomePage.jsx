@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { RouterContext } from '../../context/AppContexts';
-import { Search, MapPin, Building2, User, FileText, ChevronRight, FileDigit, CalendarClock, Globe, Car, Heart, Clock, Wifi, ArrowRight } from 'lucide-react';
+import { Search, MapPin, Building2, User, FileText, ChevronRight, FileDigit, CalendarClock, Globe, Car, Heart, Clock, Wifi, ArrowRight, Check } from 'lucide-react';
 
 export function HomePage({ onOpenModal }) {
   const { setPage, setGlobalSearch } = useContext(RouterContext);
@@ -134,17 +134,76 @@ export function HomePage({ onOpenModal }) {
             <div className="mt-8 pt-6 border-t border-slate-100">
               <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Trámites en curso</p>
               <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-100">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600"><FileDigit size={18} /></div>
-                    <div>
-                      <p className="font-bold text-slate-800 text-sm">Cédula de Identidad</p>
-                      <p className="text-xs text-slate-500">Folio: CI-2026-8891</p>
+                <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><FileDigit size={18} /></div>
+                      <div>
+                        <p className="font-bold text-slate-800 text-sm">Cédula de Identidad</p>
+                        <p className="text-xs text-slate-500 font-medium">Folio: CI-2026-8891</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.625rem] font-bold bg-amber-100 text-amber-700 border border-amber-200/50">En fabricación</span>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.625rem] font-bold bg-amber-100 text-amber-700">En fabricación</span>
-                    <p className="text-[0.625rem] text-slate-400 mt-1">Ingresado hace 2 días</p>
+                  
+                  <div className="mt-4 pt-4 border-t border-slate-100 pl-2">
+                    <div className="space-y-4">
+                      <div className="flex gap-3 relative">
+                        <div className="absolute top-6 left-2 w-[2px] h-[calc(100%+8px)] -ml-[1px] bg-blue-600"></div>
+                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-blue-600 text-white relative z-10 ring-4 ring-white">
+                          <Check size={10} strokeWidth={3} />
+                        </div>
+                        <div className="flex-1 -mt-1">
+                          <p className="text-[0.8125rem] font-bold text-slate-800">Solicitud ingresada</p>
+                          <p className="text-[0.6875rem] text-slate-500 mt-0.5">Captura de datos biográficos y biométricos.</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[0.6875rem] font-semibold text-slate-500">09 May</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex gap-3 relative">
+                        <div className="absolute top-6 left-2 w-[2px] h-[calc(100%+8px)] -ml-[1px] bg-slate-100"></div>
+                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-blue-600 text-white relative z-10 ring-4 ring-white">
+                           <Check size={10} strokeWidth={3} />
+                        </div>
+                        <div className="flex-1 -mt-1">
+                          <p className="text-[0.8125rem] font-bold text-slate-800">Revisión de antecedentes</p>
+                          <p className="text-[0.6875rem] text-slate-500 mt-0.5">Validación de identidad aprobada.</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[0.6875rem] font-semibold text-slate-500">10 May</p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 relative">
+                        <div className="absolute top-6 left-2 w-[2px] h-[calc(100%+8px)] -ml-[1px] bg-slate-100"></div>
+                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-amber-500 relative z-10 ring-4 ring-white">
+                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
+                        </div>
+                        <div className="flex-1 -mt-1">
+                          <p className="text-[0.8125rem] font-bold text-amber-600">En fabricación</p>
+                          <p className="text-[0.6875rem] text-slate-500 mt-0.5">Tu documento se encuentra en proceso de impresión.</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[0.6875rem] font-semibold text-amber-500">En curso</p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-3 relative">
+                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-slate-200 relative z-10 ring-4 ring-white">
+                        </div>
+                        <div className="flex-1 -mt-1">
+                          <p className="text-[0.8125rem] font-bold text-slate-400">Listo para retiro</p>
+                          <p className="text-[0.6875rem] text-slate-400 mt-0.5">Estará disponible en la sucursal seleccionada.</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-[0.6875rem] font-semibold text-slate-300">-</p>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
