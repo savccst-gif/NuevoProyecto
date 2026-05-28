@@ -1,10 +1,8 @@
 import React, { useState } from 'react';
 import { RouterContext, AccessibilityProvider, CartProvider } from './context/AppContexts';
 import { Navbar } from './views/components/Navbar';
-import { CarroCertificados } from './views/components/CarroCertificados';
 import { ModalFormulario } from './views/components/ModalFormulario';
 import { LoginModal } from './views/components/LoginModal';
-import { AccessibilityPanel } from './views/components/AccessibilityPanel';
 import { ReadingAssistant } from './views/components/ReadingAssistant';
 import { HomePage } from './views/pages/HomePage';
 import { TramitesPage } from './views/pages/TramitesPage';
@@ -42,8 +40,6 @@ function PortalContent() {
           </div>
         </main>
 
-        <CarroCertificados />
-        <AccessibilityPanel />
         <SparkAssistant onOpenModal={handleOpenModal} onOpenLogin={() => setLoginOpen(true)} />
         
         {modalOpen && <ModalFormulario type={modalOpen} onClose={handleCloseModal} />}

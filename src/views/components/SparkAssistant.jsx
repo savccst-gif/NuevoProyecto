@@ -18,7 +18,15 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
   const [customInput, setCustomInput] = useState('');
   const [soundEnabled, setSoundEnabled] = useState(false);
   
-  const { readingMode, toggleReadingMode, highContrast, toggleHighContrast } = useAccessibility();
+  const { 
+    fontSize, 
+    increaseFontSize, 
+    decreaseFontSize, 
+    readingMode, 
+    toggleReadingMode, 
+    highContrast, 
+    toggleHighContrast 
+  } = useAccessibility();
   const { totalItems, addToCart } = useContext(CartContext);
   const { setPage } = useContext(RouterContext);
   
@@ -31,20 +39,74 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
     }
   }, [chatHistory, isProcessing]);
 
-  // Speech helper
+  const [selectedVoice, setSelectedVoice] = useState(null);
+
+  // Selección de la voz en español más fluida y natural del sistema
+  useEffect(() => {
+    const selectBestVoice = () => {
+      const synth = window.speechSynthesis;
+      if (!synth) return;
+      const voices = synth.getVoices();
+      const spanishVoices = voices.filter(v => v.lang.toLowerCase().startsWith('es'));
+      if (spanishVoices.length === 0) return;
+
+      // Buscar por orden de preferencia para garantizar máxima fluidez regional:
+      // 1. Español de Chile (es-CL)
+      // 2. Español de México (es-MX)
+      // 3. Voces de alta calidad ("natural", "google", "sabina", "helena")
+      // 4. Primera voz en español disponible
+      let voice = spanishVoices.find(v => v.lang.toLowerCase().includes('cl'));
+      if (!voice) {
+        voice = spanishVoices.find(v => v.lang.toLowerCase().includes('mx'));
+      }
+      if (!voice) {
+        voice = spanishVoices.find(v => {
+          const name = v.name.toLowerCase();
+          return name.includes('google') || name.includes('natural') || name.includes('sabina') || name.includes('helena');
+        });
+      }
+      if (!voice) {
+        voice = spanishVoices[0];
+      }
+      setSelectedVoice(voice);
+    };
+
+    selectBestVoice();
+    if (window.speechSynthesis) {
+      window.speechSynthesis.onvoiceschanged = selectBestVoice;
+    }
+  }, []);
+
+  // Speech helper de alto rendimiento y naturalidad
   const speakText = (text) => {
     if (!soundEnabled) return;
     const synth = window.speechSynthesis;
     if (synth.speaking) synth.cancel();
     
-    // Remove emojis for cleaner speech
-    const cleanText = text.replace(/[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, "");
+    // Preprocesar el texto para mejorar el ritmo de lectura
+    let cleanText = text.replace(/[\uE000-\uF8FF]|\uD83C[\uDC00-\uDFFF]|\uD83D[\uDC00-\uDFFF]|[\u2011-\u26FF]|\uD83E[\uDD10-\uDDFF]/g, "");
+    
+    // Mejorar pronunciación de términos técnicos y abreviaturas
+    cleanText = cleanText.replace(/PDF/gi, "archivo P.D.F.");
+    cleanText = cleanText.replace(/100%/g, "cien por ciento");
+    cleanText = cleanText.replace(/RUT/gi, "rut");
+    cleanText = cleanText.replace(/✨/g, ""); // remover chispas
     
     const utterance = new SpeechSynthesisUtterance(cleanText);
-    utterance.lang = 'es-CL';
-    utterance.rate = 1.05;
+    
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
+    } else {
+      utterance.lang = 'es-CL';
+    }
+    
+    // Calibración acústica premium para una cadencia y vocalización súper fluida
+    utterance.rate = 0.93;  // Velocidad sutilmente más relajada para máxima claridad y naturalidad
+    utterance.pitch = 1.06; // Tono levemente elevado para sonar entusiasta y amigable, no robótica
+    
     synth.speak(utterance);
   };
+
 
   const handleSparkInteraction = () => {
     if (!isOpen) {
@@ -147,20 +209,30 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
       {/* Spark Assistant Panel */}
       <div 
         className={`
-          mb-4 w-96 max-w-[calc(100vw-2rem)] rounded-3xl shadow-2xl transition-all duration-300 transform origin-bottom-right
-          bg-slate-900/90 backdrop-blur-xl border border-white/10 text-white overflow-hidden flex flex-col h-[520px]
+          mb-4 w-96 max-w-[calc(100vw-2rem)] rounded-3xl transition-all duration-300 transform origin-bottom-right
+          backdrop-blur-xl overflow-hidden flex flex-col h-[520px]
           ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-90 pointer-events-none'}
+          ${highContrast 
+            ? 'bg-slate-950/95 border border-cyan-500/40 text-white shadow-[0_0_30px_rgba(6,182,212,0.25)]' 
+            : 'bg-white/90 border border-slate-200 text-slate-800 shadow-[0_10px_50px_rgba(0,0,0,0.12)]'}
         `}
       >
         {/* Panel Header */}
-        <div className="px-5 py-4 bg-gradient-to-r from-spark-cyan/20 to-spark-violet/20 border-b border-white/10 flex items-center justify-between">
+        <div 
+          className={`
+            px-5 py-4 flex items-center justify-between transition-colors duration-200
+            ${highContrast 
+              ? 'bg-gradient-to-r from-spark-cyan/20 to-spark-violet/20 border-b border-white/10' 
+              : 'bg-gradient-to-r from-blue-50/80 to-slate-50/80 border-b border-slate-100'}
+          `}
+        >
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-spark-cyan to-spark-violet flex items-center justify-center shadow-lg relative animate-pulse">
               <Sparkles size={16} className="text-white animate-spin" style={{ animationDuration: '4s' }} />
             </div>
             <div>
-              <p className="font-bold text-sm tracking-wide bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent">Spark</p>
-              <p className="text-[10px] text-cyan-300 font-semibold tracking-wider uppercase">Facilitador Digital</p>
+              <p className={`font-bold text-sm tracking-wide ${highContrast ? 'bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent' : 'text-slate-800'}`}>Spark</p>
+              <p className={`text-[10px] font-semibold tracking-wider uppercase ${highContrast ? 'text-cyan-300' : 'text-blue-600'}`}>Facilitador Digital</p>
             </div>
           </div>
           
@@ -171,14 +243,24 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                 setSoundEnabled(newState);
                 if (newState) speakText("Voz de asistencia habilitada.");
               }}
-              className={`p-2 rounded-xl border border-white/5 transition-all ${soundEnabled ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+              className={`
+                p-2 rounded-xl border transition-all 
+                ${highContrast 
+                  ? soundEnabled ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5 border-white/5'
+                  : soundEnabled ? 'bg-blue-100 text-blue-700 border-blue-200' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 border-slate-200'}
+              `}
               title={soundEnabled ? "Desactivar voz de Spark" : "Activar voz de Spark"}
             >
               {soundEnabled ? <Volume2 size={15} /> : <VolumeX size={15} />}
             </button>
             <button 
               onClick={() => setIsOpen(false)}
-              className="p-2 text-slate-400 hover:text-white hover:bg-white/5 rounded-xl border border-white/5 transition-all"
+              className={`
+                p-2 rounded-xl border transition-all
+                ${highContrast 
+                  ? 'text-slate-400 hover:text-white hover:bg-white/5 border-white/5' 
+                  : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 border-slate-200'}
+              `}
             >
               <X size={15} />
             </button>
@@ -197,8 +279,10 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                   className={`
                     max-w-[85%] px-4 py-3 rounded-2xl text-xs leading-relaxed font-medium shadow-md
                     ${msg.sender === 'user' 
-                      ? 'bg-blue-600/90 text-white rounded-tr-none' 
-                      : 'bg-white/10 backdrop-blur-md border border-white/5 text-slate-100 rounded-tl-none'}
+                      ? 'bg-blue-600 text-white rounded-tr-none' 
+                      : highContrast
+                        ? 'bg-white/10 backdrop-blur-md border border-white/5 text-slate-100 rounded-tl-none'
+                        : 'bg-slate-100 border border-slate-200/60 text-slate-700 rounded-tl-none'}
                   `}
                 >
                   <p>{msg.text}</p>
@@ -209,10 +293,15 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
             {/* Spark Writing Indicator */}
             {isProcessing && (
               <div className="flex justify-start">
-                <div className="bg-white/10 backdrop-blur-md border border-white/5 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5 shadow-md">
-                  <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 bg-cyan-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                <div className={`
+                  px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5 shadow-md border
+                  ${highContrast 
+                    ? 'bg-white/10 backdrop-blur-md border-white/5' 
+                    : 'bg-slate-100 border-slate-200/60'}
+                `}>
+                  <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${highContrast ? 'bg-cyan-400' : 'bg-blue-600'}`} style={{ animationDelay: '0ms' }} />
+                  <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${highContrast ? 'bg-violet-400' : 'bg-indigo-600'}`} style={{ animationDelay: '150ms' }} />
+                  <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${highContrast ? 'bg-cyan-400' : 'bg-blue-600'}`} style={{ animationDelay: '300ms' }} />
                   <span className="text-[10px] text-slate-400 font-semibold ml-1">Escribiendo...</span>
                 </div>
               </div>
@@ -221,7 +310,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
           </div>
 
           {/* Quick Predefined Questions */}
-          <div className="pt-4 border-t border-white/5 space-y-2">
+          <div className={`pt-4 border-t space-y-2 ${highContrast ? 'border-white/5' : 'border-slate-100'}`}>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2">Preguntas frecuentes</p>
             <div className="flex flex-col gap-1.5">
               {PREDEFINED_QS.map((faq, i) => (
@@ -229,62 +318,136 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                   key={i}
                   onClick={() => handleQuickQuestion(faq.q, faq.a)}
                   disabled={isProcessing}
-                  className="w-full text-left px-3 py-2 bg-white/5 hover:bg-white/10 active:bg-white/15 rounded-xl border border-white/5 hover:border-white/10 text-[11px] text-slate-300 font-medium transition-all flex items-center justify-between group"
+                  className={`
+                    w-full text-left px-3 py-2 rounded-xl border text-[11px] font-medium transition-all flex items-center justify-between group
+                    ${highContrast 
+                      ? 'bg-white/5 hover:bg-white/10 active:bg-white/15 border-white/5 hover:border-white/10 text-slate-300' 
+                      : 'bg-slate-50 hover:bg-slate-100 border-slate-200/60 hover:border-slate-200 text-slate-600'}
+                  `}
                 >
                   <span className="truncate pr-2">{faq.q}</span>
-                  <MessageSquare size={12} className="text-slate-500 group-hover:text-cyan-400 transition-colors flex-shrink-0" />
+                  <MessageSquare size={12} className={`flex-shrink-0 transition-colors ${highContrast ? 'text-slate-500 group-hover:text-cyan-400' : 'text-slate-400 group-hover:text-blue-600'}`} />
                 </button>
               ))}
             </div>
           </div>
 
           {/* Spark Super Tools & Actions */}
-          <div className="pt-3 border-t border-white/5 space-y-2">
+          <div className={`pt-3 border-t space-y-2 ${highContrast ? 'border-white/5' : 'border-slate-100'}`}>
             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2">Atajos inteligentes de Spark</p>
             <div className="grid grid-cols-2 gap-2">
               <button 
                 onClick={() => runAction('reading')}
-                className={`p-3 text-left rounded-xl border transition-all flex flex-col justify-between h-20 group relative overflow-hidden ${readingMode ? 'bg-cyan-500/20 border-cyan-400/40 text-cyan-200' : 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300'}`}
+                className={`
+                  p-3 text-left rounded-xl border transition-all flex flex-col justify-between h-20 group relative overflow-hidden 
+                  ${readingMode 
+                    ? highContrast ? 'bg-cyan-500/20 border-cyan-400/40 text-cyan-200' : 'bg-blue-50 border-blue-200 text-blue-700' 
+                    : highContrast ? 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300' : 'bg-slate-50 border-slate-100 hover:bg-slate-100/80 text-slate-600'}
+                `}
               >
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><Accessibility size={36} /></div>
-                <Accessibility size={16} className={readingMode ? 'text-cyan-400' : 'text-slate-400 group-hover:text-cyan-400'} />
+                <Accessibility size={16} className={readingMode ? (highContrast ? 'text-cyan-400' : 'text-blue-600') : (highContrast ? 'text-slate-400 group-hover:text-cyan-400' : 'text-slate-400 group-hover:text-blue-600')} />
                 <span className="text-[10px] font-bold leading-tight mt-2">Lectura Guiada (Audio)</span>
               </button>
 
               <button 
                 onClick={() => runAction('contrast')}
-                className={`p-3 text-left rounded-xl border transition-all flex flex-col justify-between h-20 group relative overflow-hidden ${highContrast ? 'bg-violet-500/20 border-violet-400/40 text-violet-200' : 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300'}`}
+                className={`
+                  p-3 text-left rounded-xl border transition-all flex flex-col justify-between h-20 group relative overflow-hidden 
+                  ${highContrast 
+                    ? 'bg-violet-500/20 border-violet-400/40 text-violet-200' 
+                    : 'bg-slate-50 border-slate-100 hover:bg-slate-100/80 text-slate-600'}
+                `}
               >
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><Accessibility size={36} /></div>
-                <div className="w-4 h-4 rounded-full border border-slate-400 flex items-center justify-center overflow-hidden flex-shrink-0 group-hover:border-violet-400 transition-colors">
-                  <div className="w-2 h-4 bg-slate-400 group-hover:bg-violet-400 transition-colors self-start" />
+                <div className={`w-4 h-4 rounded-full border flex items-center justify-center overflow-hidden flex-shrink-0 transition-colors ${highContrast ? 'border-violet-400' : 'border-slate-400 group-hover:border-violet-600'}`}>
+                  <div className={`w-2 h-4 ${highContrast ? 'bg-violet-400' : 'bg-slate-400 group-hover:bg-violet-600'}`} />
                 </div>
                 <span className="text-[10px] font-bold leading-tight mt-2">Alto Contraste</span>
               </button>
 
               <button 
                 onClick={() => runAction('birth')}
-                className="p-3 text-left bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl transition-all flex flex-col justify-between h-20 group relative overflow-hidden text-slate-300"
+                className={`
+                  p-3 text-left border rounded-xl transition-all flex flex-col justify-between h-20 group relative overflow-hidden 
+                  ${highContrast 
+                    ? 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300' 
+                    : 'bg-slate-50 border-slate-100 hover:bg-slate-100/80 text-slate-600'}
+                `}
               >
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><ShoppingBag size={36} /></div>
-                <ShoppingBag size={16} className="text-slate-400 group-hover:text-cyan-400 transition-colors" />
+                <ShoppingBag size={16} className={`transition-colors ${highContrast ? 'text-slate-400 group-hover:text-cyan-400' : 'text-slate-400 group-hover:text-blue-600'}`} />
                 <span className="text-[10px] font-bold leading-tight mt-2">Añadir Certificado</span>
               </button>
 
               <button 
                 onClick={() => runAction('schedule')}
-                className="p-3 text-left bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl transition-all flex flex-col justify-between h-20 group relative overflow-hidden text-slate-300"
+                className={`
+                  p-3 text-left border rounded-xl transition-all flex flex-col justify-between h-20 group relative overflow-hidden 
+                  ${highContrast 
+                    ? 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300' 
+                    : 'bg-slate-50 border-slate-100 hover:bg-slate-100/80 text-slate-600'}
+                `}
               >
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><Calendar size={36} /></div>
-                <Calendar size={16} className="text-slate-400 group-hover:text-violet-400 transition-colors" />
+                <Calendar size={16} className={`transition-colors ${highContrast ? 'text-slate-400 group-hover:text-violet-400' : 'text-slate-400 group-hover:text-blue-600'}`} />
                 <span className="text-[10px] font-bold leading-tight mt-2">Agendar Hora</span>
               </button>
             </div>
             
-            <div className="grid grid-cols-2 gap-2 mt-1">
+            {/* Control de Tamaño de Texto en toda la página */}
+            <div 
+              className={`
+                p-3 border rounded-xl flex items-center justify-between text-xs transition-colors
+                ${highContrast 
+                  ? 'bg-white/5 border-white/5 text-slate-300' 
+                  : 'bg-slate-50 border-slate-200/50 text-slate-700'}
+              `}
+            >
+              <span className="font-semibold tracking-wide flex items-center gap-1.5">
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${highContrast ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>A</span>
+                Tamaño del Texto
+              </span>
+              <div className="flex items-center gap-1.5">
+                <button 
+                  onClick={decreaseFontSize}
+                  className={`
+                    w-8 h-8 rounded-lg border active:scale-95 transition-all font-bold flex items-center justify-center text-xs
+                    ${highContrast 
+                      ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-200' 
+                      : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'}
+                  `}
+                  title="Disminuir tamaño de letra"
+                >
+                  A-
+                </button>
+                <span className={`font-extrabold text-[10px] w-12 text-center py-1 rounded-md tracking-wider ${highContrast ? 'bg-white/10 text-cyan-300' : 'bg-slate-200 text-blue-700'}`}>
+                  {fontSize}px
+                </span>
+                <button 
+                  onClick={increaseFontSize}
+                  className={`
+                    w-8 h-8 rounded-lg border active:scale-95 transition-all font-bold flex items-center justify-center text-xs
+                    ${highContrast 
+                      ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-200' 
+                      : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'}
+                  `}
+                  title="Aumentar tamaño de letra"
+                >
+                  A+
+                </button>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-2">
               <button 
                 onClick={() => runAction('folio')}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-[10px] font-semibold flex items-center justify-center gap-1.5 border border-white/5 hover:border-white/10 text-slate-300 transition-all"
+                className={`
+                  px-3 py-2 rounded-xl text-[10px] font-semibold flex items-center justify-center gap-1.5 border transition-all
+                  ${highContrast 
+                    ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-300' 
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'}
+                `}
               >
                 <Search size={12} />
                 <span>Seguimiento Folio</span>
@@ -292,7 +455,12 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
 
               <button 
                 onClick={() => runAction('help')}
-                className="px-3 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl text-[10px] font-semibold flex items-center justify-center gap-1.5 border border-white/5 hover:border-white/10 text-slate-300 transition-all"
+                className={`
+                  px-3 py-2 rounded-xl text-[10px] font-semibold flex items-center justify-center gap-1.5 border transition-all
+                  ${highContrast 
+                    ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-300' 
+                    : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'}
+                `}
               >
                 <MessageSquare size={12} />
                 <span>Ver Centro Ayuda</span>
@@ -302,19 +470,37 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
         </div>
 
         {/* Chat Input Footer */}
-        <form onSubmit={handleSendMessage} className="p-3 bg-slate-950/80 border-t border-white/10 flex items-center gap-2">
+        <form 
+          onSubmit={handleSendMessage} 
+          className={`
+            p-3 flex items-center gap-2 transition-colors duration-200
+            ${highContrast 
+              ? 'bg-slate-950/80 border-t border-white/10' 
+              : 'bg-slate-50 border-t border-slate-200/60'}
+          `}
+        >
           <input 
             type="text" 
             value={customInput}
             onChange={(e) => setCustomInput(e.target.value)}
             disabled={isProcessing}
             placeholder="Escribe tu duda aquí..." 
-            className="flex-1 bg-white/5 border border-white/5 rounded-xl px-3 py-2.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30 transition-all outline-none"
+            className={`
+              flex-1 border rounded-xl px-3 py-2.5 text-xs transition-all outline-none
+              ${highContrast 
+                ? 'bg-white/5 border-white/5 text-slate-100 placeholder-slate-300 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30' 
+                : 'bg-white border-slate-200 text-slate-800 placeholder-slate-400 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20'}
+            `}
           />
           <button 
             type="submit" 
             disabled={!customInput.trim() || isProcessing}
-            className="p-2.5 bg-gradient-to-tr from-spark-cyan to-spark-violet rounded-xl hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:scale-100 transition-all flex items-center justify-center"
+            className={`
+              p-2.5 rounded-xl hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:scale-100 transition-all flex items-center justify-center
+              ${highContrast 
+                ? 'bg-gradient-to-tr from-spark-cyan to-spark-violet' 
+                : 'bg-blue-600 text-white'}
+            `}
           >
             <Send size={13} className="text-white" />
           </button>
@@ -328,10 +514,12 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
         aria-label="Abrir asistente de accesibilidad y ayuda Spark"
         className={`
           relative flex items-center justify-center w-16 h-16 rounded-full 
-          bg-slate-900/60 backdrop-blur-xl border border-white/15 
-          cursor-pointer transition-all duration-300 hover:scale-110 focus:outline-none
+          backdrop-blur-xl border cursor-pointer transition-all duration-300 hover:scale-110 focus:outline-none
           ${isOpen ? 'ring-4 ring-cyan-500/20' : ''}
-          ${isProcessing ? 'animate-pulse-glow' : 'shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)] animate-float'}
+          ${highContrast 
+            ? 'bg-slate-900/60 border-white/15 shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:shadow-[0_0_30px_rgba(139,92,246,0.6)]' 
+            : 'bg-white/80 border-slate-200/80 shadow-[0_8px_30px_rgba(0,0,0,0.06)] hover:shadow-[0_10px_35px_rgba(139,92,246,0.2)]'}
+          ${isProcessing ? 'animate-pulse-glow' : 'animate-float'}
         `}
       >
         {/* Glow rings in background */}
@@ -365,3 +553,4 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
     </div>
   );
 }
+

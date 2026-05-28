@@ -88,12 +88,12 @@ body {
 
 /* Text colors */
 [data-hc="1"] .text-slate-900,
-[data-hc="1"] .text-slate-800      { color: #eef2ff !important; }
-[data-hc="1"] .text-slate-700      { color: #dde4f8 !important; }
-[data-hc="1"] .text-slate-600      { color: #b8c5e4 !important; }
-[data-hc="1"] .text-slate-500      { color: #8898c2 !important; }
+[data-hc="1"] .text-slate-800      { color: #ffffff !important; }
+[data-hc="1"] .text-slate-700      { color: #f8fafc !important; }
+[data-hc="1"] .text-slate-600      { color: #e2e8f0 !important; }
+[data-hc="1"] .text-slate-500      { color: #cbd5e1 !important; }
 [data-hc="1"] .text-slate-400,
-[data-hc="1"] .text-slate-300      { color: #5a6a90 !important; }
+[data-hc="1"] .text-slate-300      { color: #cbd5e1 !important; }
 [data-hc="1"] .text-blue-600       { color: #60a5fa !important; }
 [data-hc="1"] .text-blue-500       { color: #60a5fa !important; }
 [data-hc="1"] .text-blue-300       { color: #93c5fd !important; }
