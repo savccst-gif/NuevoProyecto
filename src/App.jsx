@@ -10,6 +10,8 @@ import { HomePage } from './views/pages/HomePage';
 import { TramitesPage } from './views/pages/TramitesPage';
 import { SucursalesPage } from './views/pages/SucursalesPage';
 import { AyudaPage } from './views/pages/AyudaPage';
+import SparkAssistant from './views/components/SparkAssistant';
+
 
 function PortalContent() {
   const [currentPage, setCurrentPage] = useState('home');
@@ -42,9 +44,11 @@ function PortalContent() {
 
         <CarroCertificados />
         <AccessibilityPanel />
+        <SparkAssistant onOpenModal={handleOpenModal} onOpenLogin={() => setLoginOpen(true)} />
         
         {modalOpen && <ModalFormulario type={modalOpen} onClose={handleCloseModal} />}
         {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} onSubmit={() => {}} />}
+
       </div>
     </RouterContext.Provider>
   );
