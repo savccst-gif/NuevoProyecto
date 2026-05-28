@@ -208,6 +208,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
       
       {/* Spark Assistant Panel */}
       <div 
+        style={{ fontSize: `${Math.max(12, fontSize * 0.85)}px` }}
         className={`
           mb-4 w-96 max-w-[calc(100vw-2rem)] rounded-3xl transition-all duration-300 transform origin-bottom-right
           backdrop-blur-xl overflow-hidden flex flex-col h-[520px]
@@ -231,8 +232,8 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               <Sparkles size={16} className="text-white animate-spin" style={{ animationDuration: '4s' }} />
             </div>
             <div>
-              <p className={`font-bold text-sm tracking-wide ${highContrast ? 'bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent' : 'text-slate-800'}`}>Spark</p>
-              <p className={`text-[10px] font-semibold tracking-wider uppercase ${highContrast ? 'text-cyan-300' : 'text-blue-600'}`}>Facilitador Digital</p>
+              <p className={`font-bold text-[1.05em] tracking-wide ${highContrast ? 'bg-gradient-to-r from-cyan-400 to-violet-400 bg-clip-text text-transparent' : 'text-slate-800'}`}>Spark</p>
+              <p className={`text-[0.75em] font-semibold tracking-wider uppercase ${highContrast ? 'text-cyan-300' : 'text-blue-600'}`}>Facilitador Digital</p>
             </div>
           </div>
           
@@ -244,7 +245,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                 if (newState) speakText("Voz de asistencia habilitada.");
               }}
               className={`
-                p-2 rounded-xl border transition-all 
+                p-2 rounded-xl border transition-all text-[0.85em]
                 ${highContrast 
                   ? soundEnabled ? 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30' : 'text-slate-400 hover:text-white hover:bg-white/5 border-white/5'
                   : soundEnabled ? 'bg-blue-100 text-blue-700 border-blue-200' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 border-slate-200'}
@@ -256,7 +257,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
             <button 
               onClick={() => setIsOpen(false)}
               className={`
-                p-2 rounded-xl border transition-all
+                p-2 rounded-xl border transition-all text-[0.85em]
                 ${highContrast 
                   ? 'text-slate-400 hover:text-white hover:bg-white/5 border-white/5' 
                   : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100 border-slate-200'}
@@ -277,7 +278,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               >
                 <div 
                   className={`
-                    max-w-[85%] px-4 py-3 rounded-2xl text-xs leading-relaxed font-medium shadow-md
+                    max-w-[85%] px-4 py-3 rounded-2xl text-[0.88em] leading-relaxed font-medium shadow-md
                     ${msg.sender === 'user' 
                       ? 'bg-blue-600 text-white rounded-tr-none' 
                       : highContrast
@@ -302,7 +303,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                   <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${highContrast ? 'bg-cyan-400' : 'bg-blue-600'}`} style={{ animationDelay: '0ms' }} />
                   <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${highContrast ? 'bg-violet-400' : 'bg-indigo-600'}`} style={{ animationDelay: '150ms' }} />
                   <span className={`w-1.5 h-1.5 rounded-full animate-bounce ${highContrast ? 'bg-cyan-400' : 'bg-blue-600'}`} style={{ animationDelay: '300ms' }} />
-                  <span className="text-[10px] text-slate-400 font-semibold ml-1">Escribiendo...</span>
+                  <span className="text-[0.78em] text-slate-400 font-semibold ml-1">Escribiendo...</span>
                 </div>
               </div>
             )}
@@ -311,7 +312,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
 
           {/* Quick Predefined Questions */}
           <div className={`pt-4 border-t space-y-2 ${highContrast ? 'border-white/5' : 'border-slate-100'}`}>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2">Preguntas frecuentes</p>
+            <p className="text-[0.78em] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2">Preguntas frecuentes</p>
             <div className="flex flex-col gap-1.5">
               {PREDEFINED_QS.map((faq, i) => (
                 <button 
@@ -319,7 +320,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                   onClick={() => handleQuickQuestion(faq.q, faq.a)}
                   disabled={isProcessing}
                   className={`
-                    w-full text-left px-3 py-2 rounded-xl border text-[11px] font-medium transition-all flex items-center justify-between group
+                    w-full text-left px-3 py-2 rounded-xl border text-[0.82em] font-medium transition-all flex items-center justify-between group
                     ${highContrast 
                       ? 'bg-white/5 hover:bg-white/10 active:bg-white/15 border-white/5 hover:border-white/10 text-slate-300' 
                       : 'bg-slate-50 hover:bg-slate-100 border-slate-200/60 hover:border-slate-200 text-slate-600'}
@@ -334,7 +335,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
 
           {/* Spark Super Tools & Actions */}
           <div className={`pt-3 border-t space-y-2 ${highContrast ? 'border-white/5' : 'border-slate-100'}`}>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2">Atajos inteligentes de Spark</p>
+            <p className="text-[0.78em] font-bold text-slate-400 uppercase tracking-widest pl-1 mb-2">Atajos inteligentes de Spark</p>
             <div className="grid grid-cols-2 gap-2">
               <button 
                 onClick={() => runAction('reading')}
@@ -347,7 +348,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               >
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><Accessibility size={36} /></div>
                 <Accessibility size={16} className={readingMode ? (highContrast ? 'text-cyan-400' : 'text-blue-600') : (highContrast ? 'text-slate-400 group-hover:text-cyan-400' : 'text-slate-400 group-hover:text-blue-600')} />
-                <span className="text-[10px] font-bold leading-tight mt-2">Lectura Guiada (Audio)</span>
+                <span className="text-[0.78em] font-bold leading-tight mt-2">Lectura Guiada (Audio)</span>
               </button>
 
               <button 
@@ -363,7 +364,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                 <div className={`w-4 h-4 rounded-full border flex items-center justify-center overflow-hidden flex-shrink-0 transition-colors ${highContrast ? 'border-violet-400' : 'border-slate-400 group-hover:border-violet-600'}`}>
                   <div className={`w-2 h-4 ${highContrast ? 'bg-violet-400' : 'bg-slate-400 group-hover:bg-violet-600'}`} />
                 </div>
-                <span className="text-[10px] font-bold leading-tight mt-2">Alto Contraste</span>
+                <span className="text-[0.78em] font-bold leading-tight mt-2">Alto Contraste</span>
               </button>
 
               <button 
@@ -377,7 +378,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               >
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><ShoppingBag size={36} /></div>
                 <ShoppingBag size={16} className={`transition-colors ${highContrast ? 'text-slate-400 group-hover:text-cyan-400' : 'text-slate-400 group-hover:text-blue-600'}`} />
-                <span className="text-[10px] font-bold leading-tight mt-2">Añadir Certificado</span>
+                <span className="text-[0.78em] font-bold leading-tight mt-2">Añadir Certificado</span>
               </button>
 
               <button 
@@ -391,28 +392,28 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               >
                 <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><Calendar size={36} /></div>
                 <Calendar size={16} className={`transition-colors ${highContrast ? 'text-slate-400 group-hover:text-violet-400' : 'text-slate-400 group-hover:text-blue-600'}`} />
-                <span className="text-[10px] font-bold leading-tight mt-2">Agendar Hora</span>
+                <span className="text-[0.78em] font-bold leading-tight mt-2">Agendar Hora</span>
               </button>
             </div>
             
             {/* Control de Tamaño de Texto en toda la página */}
             <div 
               className={`
-                p-3 border rounded-xl flex items-center justify-between text-xs transition-colors
+                p-3 border rounded-xl flex items-center justify-between transition-colors
                 ${highContrast 
                   ? 'bg-white/5 border-white/5 text-slate-300' 
                   : 'bg-slate-50 border-slate-200/50 text-slate-700'}
               `}
             >
-              <span className="font-semibold tracking-wide flex items-center gap-1.5">
-                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded border ${highContrast ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>A</span>
+              <span className="font-semibold tracking-wide flex items-center gap-1.5 text-[0.85em]">
+                <span className={`text-[0.78em] font-bold px-1.5 py-0.5 rounded border ${highContrast ? 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20' : 'bg-blue-50 text-blue-600 border-blue-100'}`}>A</span>
                 Tamaño del Texto
               </span>
               <div className="flex items-center gap-1.5">
                 <button 
                   onClick={decreaseFontSize}
                   className={`
-                    w-8 h-8 rounded-lg border active:scale-95 transition-all font-bold flex items-center justify-center text-xs
+                    w-8 h-8 rounded-lg border active:scale-95 transition-all font-bold flex items-center justify-center text-[0.85em]
                     ${highContrast 
                       ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-200' 
                       : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'}
@@ -421,13 +422,13 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
                 >
                   A-
                 </button>
-                <span className={`font-extrabold text-[10px] w-12 text-center py-1 rounded-md tracking-wider ${highContrast ? 'bg-white/10 text-cyan-300' : 'bg-slate-200 text-blue-700'}`}>
+                <span className={`font-extrabold text-[0.78em] w-12 text-center py-1 rounded-md tracking-wider ${highContrast ? 'bg-white/10 text-cyan-300' : 'bg-slate-200 text-blue-700'}`}>
                   {fontSize}px
                 </span>
                 <button 
                   onClick={increaseFontSize}
                   className={`
-                    w-8 h-8 rounded-lg border active:scale-95 transition-all font-bold flex items-center justify-center text-xs
+                    w-8 h-8 rounded-lg border active:scale-95 transition-all font-bold flex items-center justify-center text-[0.85em]
                     ${highContrast 
                       ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-200' 
                       : 'bg-white hover:bg-slate-100 border-slate-200 text-slate-700 shadow-sm'}
@@ -443,7 +444,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               <button 
                 onClick={() => runAction('folio')}
                 className={`
-                  px-3 py-2 rounded-xl text-[10px] font-semibold flex items-center justify-center gap-1.5 border transition-all
+                  px-3 py-2 rounded-xl text-[0.78em] font-semibold flex items-center justify-center gap-1.5 border transition-all
                   ${highContrast 
                     ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-300' 
                     : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'}
@@ -456,7 +457,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               <button 
                 onClick={() => runAction('help')}
                 className={`
-                  px-3 py-2 rounded-xl text-[10px] font-semibold flex items-center justify-center gap-1.5 border transition-all
+                  px-3 py-2 rounded-xl text-[0.78em] font-semibold flex items-center justify-center gap-1.5 border transition-all
                   ${highContrast 
                     ? 'bg-slate-800 hover:bg-slate-700 border-white/5 hover:border-white/10 text-slate-300' 
                     : 'bg-slate-100 hover:bg-slate-200 border-slate-200 text-slate-700'}
@@ -486,7 +487,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
             disabled={isProcessing}
             placeholder="Escribe tu duda aquí..." 
             className={`
-              flex-1 border rounded-xl px-3 py-2.5 text-xs transition-all outline-none
+              flex-1 border rounded-xl px-3 py-2.5 text-[0.85em] transition-all outline-none
               ${highContrast 
                 ? 'bg-white/5 border-white/5 text-slate-100 placeholder-slate-300 focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/30' 
                 : 'bg-white border-slate-200 text-slate-800 placeholder-slate-400 focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/20'}
@@ -496,7 +497,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
             type="submit" 
             disabled={!customInput.trim() || isProcessing}
             className={`
-              p-2.5 rounded-xl hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:scale-100 transition-all flex items-center justify-center
+              p-2.5 rounded-xl hover:opacity-90 active:scale-95 disabled:opacity-40 disabled:scale-100 transition-all flex items-center justify-center text-[0.85em]
               ${highContrast 
                 ? 'bg-gradient-to-tr from-spark-cyan to-spark-violet' 
                 : 'bg-blue-600 text-white'}
@@ -553,4 +554,3 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
     </div>
   );
 }
-
