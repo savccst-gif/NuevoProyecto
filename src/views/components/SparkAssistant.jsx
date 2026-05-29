@@ -44,7 +44,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
   // Selección de la voz en español más fluida y natural del sistema
   useEffect(() => {
     const selectBestVoice = () => {
-      const synth = window.speechSynthesis;
+      const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
       if (!synth) return;
       const voices = synth.getVoices();
       const spanishVoices = voices.filter(v => v.lang.toLowerCase().startsWith('es'));
@@ -72,15 +72,17 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
     };
 
     selectBestVoice();
-    if (window.speechSynthesis) {
-      window.speechSynthesis.onvoiceschanged = selectBestVoice;
+    const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+    if (synth) {
+      synth.onvoiceschanged = selectBestVoice;
     }
   }, []);
 
   // Speech helper de alto rendimiento y naturalidad
   const speakText = (text) => {
     if (!soundEnabled) return;
-    const synth = window.speechSynthesis;
+    const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
+    if (!synth) return;
     if (synth.speaking) synth.cancel();
     
     // Preprocesar el texto para mejorar el ritmo de lectura
@@ -175,16 +177,10 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
         : "Modo de alto contraste desactivado.";
       setChatHistory(prev => [...prev, { sender: 'spark', text: txt }]);
       speakText(txt);
-    } else if (type === 'birth') {
-      addToCart({
-        id: "spark-birth-cert",
-        name: "Certificado de Nacimiento",
-        type: "Para todo trámite",
-        price: 0,
-        iconBg: "bg-blue-50",
-        iconColor: "text-blue-600"
-      });
-      const txt = "¡Hecho! Agregué un 'Certificado de Nacimiento' a tu carro de compras de inmediato.";
+    } else if (type === 'tramites') {
+      setPage('tramites');
+      setIsOpen(false);
+      const txt = "Te he llevado a la sección de Trámites. Aquí puedes buscar, ingresar tus datos y solicitar cualquier certificado de forma oficial.";
       setChatHistory(prev => [...prev, { sender: 'spark', text: txt }]);
       speakText(txt);
     } else if (type === 'schedule') {
@@ -368,17 +364,18 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
               </button>
 
               <button 
-                onClick={() => runAction('birth')}
+                onClick={() => runAction('tramites')}
                 className={`
                   p-3 text-left border rounded-xl transition-all flex flex-col justify-between h-20 group relative overflow-hidden 
                   ${highContrast 
                     ? 'bg-white/5 border-white/5 hover:bg-white/10 text-slate-300' 
                     : 'bg-slate-50 border-slate-100 hover:bg-slate-100/80 text-slate-600'}
                 `}
+                title="Ir a buscar y solicitar trámites oficiales"
               >
-                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><ShoppingBag size={36} /></div>
-                <ShoppingBag size={16} className={`transition-colors ${highContrast ? 'text-slate-400 group-hover:text-cyan-400' : 'text-slate-400 group-hover:text-blue-600'}`} />
-                <span className="text-[0.78em] font-bold leading-tight mt-2">Añadir Certificado</span>
+                <div className="absolute top-0 right-0 p-2 opacity-10 group-hover:opacity-20 transition-opacity"><Search size={36} /></div>
+                <Search size={16} className={`transition-colors ${highContrast ? 'text-slate-400 group-hover:text-cyan-400' : 'text-slate-400 group-hover:text-blue-600'}`} />
+                <span className="text-[0.78em] font-bold leading-tight mt-2">Buscar Trámite</span>
               </button>
 
               <button 

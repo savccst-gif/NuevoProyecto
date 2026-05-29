@@ -9,6 +9,7 @@ import { TramitesPage } from './views/pages/TramitesPage';
 import { SucursalesPage } from './views/pages/SucursalesPage';
 import { AyudaPage } from './views/pages/AyudaPage';
 import SparkAssistant from './views/components/SparkAssistant';
+import { CarroCertificados } from './views/components/CarroCertificados';
 
 
 function PortalContent() {
@@ -41,6 +42,7 @@ function PortalContent() {
         </main>
 
         <SparkAssistant onOpenModal={handleOpenModal} onOpenLogin={() => setLoginOpen(true)} />
+        <CarroCertificados />
         
         {modalOpen && <ModalFormulario type={modalOpen} onClose={handleCloseModal} />}
         {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} onSubmit={() => {}} />}

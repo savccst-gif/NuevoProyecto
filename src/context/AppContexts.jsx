@@ -51,8 +51,10 @@ export function useAccessibility() {
 export function CartProvider({ children }) {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([
-    { id: "1", name: "Certificado de Nacimiento", type: "Para todo trámite", price: 0, qty: 2, iconBg: "bg-blue-50", iconColor: "text-blue-600" },
-    { id: "2", name: "Certificado de Matrimonio", type: "Con vigencia", price: 0, qty: 1, iconBg: "bg-rose-50", iconColor: "text-rose-600" },
+    { id: "1", name: "Certificado de Nacimiento (Solicitado)", type: "Para todo trámite", price: 0, qty: 1, iconBg: "bg-blue-50", iconColor: "text-blue-600" }
+  ]);
+  const [confirmedItems, setConfirmedItems] = useState([
+    { id: "c1", name: "Certificado de Matrimonio (Descarga Lista)", type: "Con vigencia", price: 0, qty: 1, iconBg: "bg-rose-50", iconColor: "text-rose-600" }
   ]);
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
@@ -60,23 +62,37 @@ export function CartProvider({ children }) {
   
   const addToCart = (itemData) => {
     setCartItems(prev => {
-      const existing = prev.find(i => i.id === itemData.id);
-      if (existing) {
-        return prev.map(i => i.id === itemData.id ? { ...i, qty: i.qty + 1 } : i);
-      }
-      return [...prev, { ...itemData, qty: 1 }];
+      const uniqueId = itemData.id === 'spark-birth-cert' ? `spark-birth-cert-${Date.now()}` : itemData.id;
+      return [...prev, { ...itemData, id: uniqueId, qty: 1 }];
     });
     setIsCartOpen(true);
   };
-  
-  const clearCart = () => setCartItems([]);
 
-  const totalItems = cartItems.reduce((s, i) => s + i.qty, 0);
+  const addConfirmedItem = (itemData) => {
+    setConfirmedItems(prev => {
+      const uniqueId = Math.random().toString(36).substr(2, 9);
+      return [...prev, { ...itemData, id: uniqueId, qty: 1 }];
+    });
+  };
+  
+  const confirmCart = () => {
+    setConfirmedItems(prev => [...prev, ...cartItems]);
+    setCartItems([]);
+    setIsCartOpen(false);
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
+    setConfirmedItems([]);
+  };
+
+  const totalItems = cartItems.length;
 
   return (
     <CartContext.Provider value={{
       isCartOpen, setIsCartOpen, toggleCart,
-      cartItems, updateQty, addToCart, clearCart, totalItems
+      cartItems, updateQty, addToCart, clearCart, totalItems,
+      confirmedItems, addConfirmedItem, confirmCart
     }}>
       {children}
     </CartContext.Provider>

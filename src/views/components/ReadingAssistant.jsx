@@ -3,10 +3,12 @@ import { useAccessibility } from '../../context/AppContexts';
 
 export function ReadingAssistant() {
   const { readingMode } = useAccessibility();
-  const synth = window.speechSynthesis;
+  const synth = typeof window !== 'undefined' ? window.speechSynthesis : null;
   const currentUtteranceRef = useRef(null);
 
   useEffect(() => {
+    if (!synth) return;
+
     if (!readingMode) {
       if (synth.speaking) synth.cancel();
       return;

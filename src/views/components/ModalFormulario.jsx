@@ -3,22 +3,33 @@ import { X } from 'lucide-react';
 import { CartContext } from '../../context/AppContexts';
 
 export function ModalFormulario({ type, onClose }) {
-  const { addToCart } = useContext(CartContext);
+  const { addToCart, addConfirmedItem } = useContext(CartContext);
   const isFolio = type === 'folio';
   const isCedula = type === 'Cédula de Identidad' || type === 'Renovar cédula' || type === 'Cédula';
   const title = isFolio ? "Agregar Trámite al Seguimiento" : isCedula ? "Cédula de Identidad" : `Solicitar ${type}`;
   const [cedulaOption, setCedulaOption] = useState('agendar');
 
   const handleSubmit = () => {
-    if (!isFolio && !(isCedula && cedulaOption === 'agendar')) {
-      addToCart({
-        id: Math.random().toString(36).substr(2, 9),
-        name: type,
-        type: isCedula ? "Reimpresión" : "Certificado",
-        price: 0,
-        iconBg: "bg-blue-50",
-        iconColor: "text-blue-600"
-      });
+    if (!isFolio) {
+      if (isCedula && cedulaOption === 'agendar') {
+        addConfirmedItem({
+          name: "Cita: Renovación de Cédula",
+          type: "Visita Agendada",
+          price: 0,
+          iconBg: "bg-amber-50",
+          iconColor: "text-amber-600"
+        });
+        alert("Cita agendada con éxito. Puedes descargar tu comprobante desde el carro de compras en la sección de Descargas.");
+      } else {
+        addToCart({
+          id: Math.random().toString(36).substr(2, 9),
+          name: type,
+          type: isCedula ? "Reimpresión" : "Certificado",
+          price: 0,
+          iconBg: "bg-blue-50",
+          iconColor: "text-blue-600"
+        });
+      }
     }
     onClose();
   };
