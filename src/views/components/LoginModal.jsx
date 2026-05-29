@@ -85,7 +85,7 @@ export function LoginModal({ onClose, onSubmit }) {
               <label className="block text-[0.78rem] font-bold text-slate-700 mb-1.5 pl-0.5">RUT Ciudadano</label>
               <input
                 type="text"
-                placeholder="17.115.693-9"
+                placeholder="12.345.678"
                 value={rut}
                 onChange={(e) => setRut(e.target.value)}
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all font-medium text-slate-700 text-sm placeholder-slate-400"
