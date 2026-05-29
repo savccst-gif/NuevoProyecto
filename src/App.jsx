@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { RouterContext, AccessibilityProvider, CartProvider } from './context/AppContexts';
+import { AuthProvider } from './context/AuthContext';
 import { Navbar } from './views/components/Navbar';
 import { ModalFormulario } from './views/components/ModalFormulario';
 import { LoginModal } from './views/components/LoginModal';
@@ -55,9 +56,11 @@ function PortalContent() {
 function App() {
   return (
     <AccessibilityProvider>
-      <CartProvider>
-        <PortalContent />
-      </CartProvider>
+      <AuthProvider>
+        <CartProvider>
+          <PortalContent />
+        </CartProvider>
+      </AuthProvider>
     </AccessibilityProvider>
   );
 }

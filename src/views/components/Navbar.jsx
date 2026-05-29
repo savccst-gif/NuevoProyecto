@@ -1,12 +1,14 @@
 import React, { useState, useContext } from 'react';
-import { Phone, Globe, User, Bell, Package, ShoppingCart, Menu, X } from 'lucide-react';
+import { Phone, Globe, User, Bell, Package, ShoppingCart, Menu, X, LogOut } from 'lucide-react';
 import { RouterContext, CartContext } from '../../context/AppContexts';
+import { useAuth } from '../../context/AuthContext';
 
 export function Navbar({ onLoginClick }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const { setPage, currentPage } = useContext(RouterContext);
   const { totalItems, toggleCart } = useContext(CartContext);
+  const { user, logout, isAuthenticated } = useAuth();
 
   const links = [
     { label: "Inicio", id: "home" }, 
@@ -40,7 +42,25 @@ export function Navbar({ onLoginClick }) {
             ))}
           </nav>
           <div className="flex items-center gap-2">
-            <button onClick={onLoginClick} className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:text-blue-700 font-medium"><User size={15} /><span className="hidden lg:block">Iniciar sesión</span></button>
+            
+            {isAuthenticated ? (
+              <div className="hidden sm:flex items-center gap-3 pl-2 pr-1 py-1 border border-slate-100 bg-slate-50 rounded-2xl">
+                <img src={user.photoURL} alt={user.displayName} className="w-7 h-7 rounded-full object-cover border border-slate-200" />
+                <div className="hidden lg:block text-left leading-none">
+                  <p className="text-[0.72rem] font-extrabold text-slate-800 leading-tight">{user.displayName.split(' ')[0]}</p>
+                  <p className="text-[0.62rem] text-slate-400 font-bold mt-0.5 leading-none">{user.rut}</p>
+                </div>
+                <button 
+                  onClick={logout} 
+                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all cursor-pointer"
+                  title="Cerrar sesión de ClaveÚnica"
+                >
+                  <LogOut size={13} />
+                </button>
+              </div>
+            ) : (
+              <button onClick={onLoginClick} className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:text-blue-700 font-medium cursor-pointer"><User size={15} /><span className="hidden lg:block">Iniciar sesión</span></button>
+            )}
             
             <div className="relative">
               <button onClick={() => setNotifOpen(!notifOpen)} className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 text-sm text-slate-600 hover:text-blue-700 relative">
@@ -75,7 +95,24 @@ export function Navbar({ onLoginClick }) {
             {links.map((l) => (
               <button key={l.id} onClick={() => { setPage(l.id); setMenuOpen(false); }} className={`px-4 py-2 text-left text-sm font-medium rounded-lg ${currentPage === l.id ? 'bg-blue-50 text-blue-700' : 'text-slate-600'}`}>{l.label}</button>
             ))}
-            <button onClick={() => { onLoginClick(); setMenuOpen(false); }} className="px-4 py-2 text-left text-sm font-medium text-slate-600">Iniciar sesión</button>
+            
+            {isAuthenticated ? (
+              <div className="px-4 py-2.5 border-t border-slate-100 flex items-center gap-3 bg-slate-50/50 rounded-xl">
+                <img src={user.photoURL} alt={user.displayName} className="w-8 h-8 rounded-full object-cover border border-slate-200" />
+                <div className="flex-1 text-left leading-none">
+                  <p className="text-xs font-black text-slate-800 leading-tight">{user.displayName}</p>
+                  <p className="text-[0.62rem] text-slate-400 font-bold mt-1 leading-none">{user.rut}</p>
+                </div>
+                <button 
+                  onClick={() => { logout(); setMenuOpen(false); }} 
+                  className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-xs font-black"
+                >
+                  Salir
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => { onLoginClick(); setMenuOpen(false); }} className="px-4 py-2 text-left text-sm font-medium text-slate-600">Iniciar sesión</button>
+            )}
           </div>
         )}
       </div>

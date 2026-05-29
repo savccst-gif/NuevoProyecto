@@ -20,14 +20,40 @@ Un portal web moderno, accesible y centrado en el usuario para los servicios del
 - **Carrito de Trámites (CartContext)**: Sistema global para sincronizar el estado de los servicios seleccionados entre diferentes partes de la interfaz, como el encabezado y el pie de página persistente.
 - **Diseño Responsivo y Estético**: Interfaz premium con colores curados, tipografías modernas y micro-animaciones para mejorar la experiencia de usuario.
 
+## 📱 Compatibilidad Móvil y Mejoras Recientes
+
+Recientemente se implementó una serie de optimizaciones críticas para garantizar un funcionamiento fluido en dispositivos móviles y una experiencia de usuario de nivel premium:
+
+- **Robustecimiento de Accesibilidad de Voz**: Se añadieron protecciones de seguridad alrededor de `window.speechSynthesis` en los asistentes de voz para evitar crasheos fatales (pantallas en blanco) en dispositivos y navegadores móviles que no soportan o restringen esta API.
+- **Acceso Explicado en Red Local**: El servidor de desarrollo de Vite se configuró con `host: true` para enlazar el servicio a la red local. Esto permite probar y validar la web directamente desde tu teléfono móvil conectado al mismo Wi-Fi usando la dirección IP local de tu computador.
+- **Rediseño del Carro de Certificados**:
+  - Se removieron los selectores de cantidad (`+/-`) para cada trámite, dado que las solicitudes de certificados oficiales requieren datos específicos e individuales por cada documento.
+  - El carro se unificó como un panel flotante único en la esquina superior derecha (`fixed top-20 right-4`), desplegándose directamente bajo el botón de navegación principal.
+  - Se incorporaron pestañas internas para separar las **Solicitudes Pendientes** del historial persistente de **Descargas / Citas** en la sesión.
+  - Se agregó soporte para descargar certificados individuales o masivos (botón "Descargar todos los certificados"), así como para visualizar los comprobantes de citas presenciales agendadas.
+- **Redirección Inteligente en Spark Assistant**: Se actualizó el acceso rápido del asistente Spark de "Añadir Certificado" a "Buscar Trámite", el cual redirige lógicamente al usuario a la pestaña de trámites y oculta el panel de ayuda para facilitar una experiencia de navegación limpia y enfocada.
+
 ## 📁 Estructura del Proyecto
 
 El proyecto sigue una arquitectura MVC adaptada para React, organizando los archivos en directorios dedicados:
 
-- `/src/components`: Componentes reutilizables de la interfaz de usuario (Vistas).
-- `/src/context` o `/src/state`: Gestión de estado global, como el `CartContext`.
-- `/src/hooks`: Lógica de negocio y controladores (Controladores).
-- `/src/models` o `/src/services`: Interacciones con datos y APIs (Modelos).
+- `/src/config`: Parámetros de configuración inicial (Firebase app, Google Provider).
+- `/src/views/components`: Componentes reutilizables de la interfaz de usuario (Vistas como `LoginButton` o `Navbar`).
+- `/src/context`: Gestión de estado global y controladores de flujo (Controladores como `AuthContext` o `AppContexts`).
+- `/src/services`: Interacciones con APIs externas y lógica de negocio (Modelos como `authService.js`).
+
+## 🔐 Autenticación Segura con Firebase (ClaveÚnica)
+
+El proyecto cuenta con un sistema de autenticación de ciudadanos premium que integra **Firebase Authentication** utilizando el proveedor de **Google**, disfrazado bajo la estética oficial chilena de **ClaveÚnica**. 
+
+Esto proporciona:
+1. **Identidad Real y Legítima**: Extrae el nombre real del usuario, correo electrónico verificado y foto de perfil oficial directo de los servidores de Google.
+2. **Arquitectura MVC Limpia**:
+   - **Configuración** (`/src/config/firebase.js`): Instancia el SDK de Firebase y el proveedor de Google Auth, con un sistema de respaldo offline que emula de forma segura el inicio de sesión si no se proveen API Keys.
+   - **Servicios/Modelo** (`/src/services/authService.js`): Dispara la autenticación mediante ventana emergente (`signInWithPopup`) y gestiona la salida de usuario.
+   - **Controlador/Contexto** (`/src/context/AuthContext.jsx`): Distribuye el estado de sesión activa usando `onAuthStateChanged` y `localStorage` para persistencia.
+   - **Vistas** (`LoginButton.jsx` y `LoginModal.jsx`): El botón visual con la cinta tricolor institucional de la identidad de Gobierno de Chile e ícono oficial.
+3. **Bypass de Desarrollo**: Cuenta con un formulario tradicional con RUT e ingreso temporal como alternativa en la base del modal de acceso.
 
 ## 🛠️ Instalación y Uso
 

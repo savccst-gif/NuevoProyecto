@@ -1,10 +1,30 @@
 import React, { useState, useContext } from 'react';
 import { RouterContext } from '../../context/AppContexts';
-import { Search, MapPin, Building2, User, FileText, ChevronRight, FileDigit, CalendarClock, Globe, Car, Heart, Clock, Wifi, ArrowRight, Check } from 'lucide-react';
+import { Search, MapPin, Building2, User, FileText, ChevronRight, FileDigit, CalendarClock, Globe, Car, Heart, Clock, Wifi, ArrowRight, Check, Download } from 'lucide-react';
 
 export function HomePage({ onOpenModal }) {
   const { setPage, setGlobalSearch } = useContext(RouterContext);
   const [query, setQuery] = useState('');
+
+  const [trackingFolio, setTrackingFolio] = useState('');
+  const [isTrackingLoading, setIsTrackingLoading] = useState(false);
+  const [trackingError, setTrackingError] = useState(null);
+  
+  // Datos iniciales cargados en pantalla
+  const [activeTracking, setActiveTracking] = useState({
+    title: 'Cédula de Identidad',
+    folio: 'CI-2026-8891',
+    status: 'En fabricación',
+    statusBg: 'bg-amber-100 text-amber-700 border-amber-200/50',
+    icon: <FileText size={18} />,
+    currentStage: 2,
+    stages: [
+      { label: "Solicitud ingresada", desc: "Captura de datos biográficos y biométricos.", date: "09 May", active: true },
+      { label: "Revisión de antecedentes", desc: "Validación de identidad aprobada.", date: "10 May", active: true },
+      { label: "En fabricación", desc: "Tu documento se encuentra en proceso de impresión.", date: "En curso", active: true },
+      { label: "Listo para retiro", desc: "Estará disponible en la sucursal seleccionada.", date: "-", active: false }
+    ]
+  });
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -12,6 +32,85 @@ export function HomePage({ onOpenModal }) {
       setGlobalSearch(query);
       setPage('tramites');
     }
+  };
+
+  const handleTrackingSearch = (e) => {
+    e.preventDefault();
+    if (!trackingFolio.trim()) {
+      setTrackingError("Ingresa un número de folio.");
+      return;
+    }
+    
+    setTrackingError(null);
+    setIsTrackingLoading(true);
+
+    setTimeout(() => {
+      const cleanFolio = trackingFolio.trim().toUpperCase();
+      
+      if (cleanFolio.includes('8891') || cleanFolio === 'CI-2026-8891') {
+        setActiveTracking({
+          title: 'Cédula de Identidad',
+          folio: 'CI-2026-8891',
+          status: 'En fabricación',
+          statusBg: 'bg-amber-100 text-amber-700 border-amber-200/50',
+          icon: <FileText size={18} />,
+          currentStage: 2,
+          stages: [
+            { label: "Solicitud ingresada", desc: "Captura de datos biográficos y biométricos.", date: "09 May", active: true },
+            { label: "Revisión de antecedentes", desc: "Validación de identidad aprobada.", date: "10 May", active: true },
+            { label: "En fabricación", desc: "Tu documento se encuentra en proceso de impresión.", date: "En curso", active: true },
+            { label: "Listo para retiro", desc: "Estará disponible en la sucursal seleccionada.", date: "-", active: false }
+          ]
+        });
+      } else if (cleanFolio.includes('7722') || cleanFolio === 'PA-2026-7722') {
+        setActiveTracking({
+          title: 'Pasaporte Oficial',
+          folio: 'PA-2026-7722',
+          status: 'Listo para retiro',
+          statusBg: 'bg-emerald-100 text-emerald-700 border-emerald-200/50',
+          icon: <Globe size={18} />,
+          currentStage: 3,
+          stages: [
+            { label: "Solicitud ingresada", desc: "Captura de huellas y fotografía digital.", date: "02 May", active: true },
+            { label: "Revisión de antecedentes", desc: "Verificación de antecedentes de viaje aprobada.", date: "04 May", active: true },
+            { label: "En fabricación", desc: "Pasaporte emitido con firma digital.", date: "08 May", active: true },
+            { label: "Listo para retiro", desc: "Disponible en Oficina Principal Providencia.", date: "12 May", active: true, highlighted: true }
+          ]
+        });
+      } else if (cleanFolio.includes('4400') || cleanFolio === 'VE-2026-4400') {
+        setActiveTracking({
+          title: 'Inscripción de Vehículo (Padrón)',
+          folio: 'VE-2026-4400',
+          status: 'Completado (Online)',
+          statusBg: 'bg-blue-100 text-blue-700 border-blue-200/50',
+          icon: <Car size={18} />,
+          currentStage: 3,
+          stages: [
+            { label: "Ingreso de transferencia", desc: "Contrato firmado electrónicamente por las partes.", date: "15 May", active: true },
+            { label: "Validación de firmas", desc: "Revisión del notario oficial aprobada.", date: "16 May", active: true },
+            { label: "Inscripción en Registro", desc: "Anotación de dominio en el Registro de Vehículos.", date: "18 May", active: true },
+            { label: "Listo para descarga", desc: "Documento oficial listo. Puedes descargarlo en línea.", date: "Disponible", active: true, highlighted: true, isDownloadable: true }
+          ]
+        });
+      } else {
+        const codeNum = cleanFolio.replace(/[^0-9]/g, '').slice(0, 4) || '5501';
+        setActiveTracking({
+          title: `Trámite General (${cleanFolio.split('-')[0] || 'Doc'})`,
+          folio: cleanFolio.startsWith('FOL-') ? cleanFolio : `FOL-2026-${codeNum}`,
+          status: 'En revisión técnica',
+          statusBg: 'bg-blue-100 text-blue-700 border-blue-200/50',
+          icon: <FileDigit size={18} />,
+          currentStage: 1,
+          stages: [
+            { label: "Solicitud ingresada", desc: "Carga de antecedentes digitalizados al portal civil.", date: "Hace 3 días", active: true },
+            { label: "Revisión técnica", desc: "Verificación de firmas, timbres y documentación adjunta.", date: "En curso", active: true },
+            { label: "Firma electrónica", desc: "Documento en validación del Oficial Civil Adjunto.", date: "Pendiente", active: false },
+            { label: "Listo para entrega", desc: "Se notificará vía correo para envío o descarga.", date: "-", active: false }
+          ]
+        });
+      }
+      setIsTrackingLoading(false);
+    }, 1200);
   };
 
   return (
@@ -126,87 +225,118 @@ export function HomePage({ onOpenModal }) {
           <div className="relative z-10">
             <h2 className="text-xl font-bold text-slate-800 mb-2">Seguimiento de Trámites</h2>
             <p className="text-slate-500 text-sm mb-6 max-w-sm">Revisa en qué etapa se encuentra tu solicitud de Cédula o Pasaporte usando tu número de folio.</p>
-            <div className="flex gap-2">
-              <input type="text" placeholder="Número de folio (Ej: 123456789)" className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm" />
-              <button onClick={() => onOpenModal('folio')} className="bg-slate-800 hover:bg-slate-900 text-white px-5 py-3 rounded-xl font-medium transition-colors text-sm whitespace-nowrap">Consultar</button>
-            </div>
+            <form onSubmit={handleTrackingSearch} className="space-y-2">
+              <div className="flex gap-2">
+                <input 
+                  type="text" 
+                  placeholder="Folio (Ej: CI-2026-8891, PA-2026-7722, VE-2026-4400)" 
+                  value={trackingFolio}
+                  onChange={(e) => setTrackingFolio(e.target.value)}
+                  className="flex-1 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all text-sm font-medium" 
+                />
+                <button type="submit" className="bg-slate-800 hover:bg-slate-900 text-white px-5 py-3 rounded-xl font-bold transition-all text-sm cursor-pointer whitespace-nowrap active:scale-[0.97]">
+                  Consultar
+                </button>
+              </div>
+              {trackingError && (
+                <p className="text-[0.68rem] text-rose-600 font-bold pl-1 animate-pulse">{trackingError}</p>
+              )}
+            </form>
 
-            <div className="mt-8 pt-6 border-t border-slate-100">
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Trámites en curso</p>
-              <div className="space-y-4">
-                <div className="p-4 bg-white rounded-2xl border border-slate-200 shadow-sm transition-all hover:shadow-md">
+            <div className="mt-6 pt-5 border-t border-slate-100">
+              <div className="flex items-center justify-between mb-4">
+                <p className="text-xs font-black text-slate-400 uppercase tracking-widest">Trámite consultado</p>
+                {activeTracking && !isTrackingLoading && (
+                  <span className="text-[0.62rem] text-blue-500 font-bold bg-blue-50 border border-blue-100 px-2 py-0.5 rounded-full">
+                    Resultados listos
+                  </span>
+                )}
+              </div>
+              
+              {isTrackingLoading ? (
+                <div className="py-12 flex flex-col items-center justify-center text-slate-500 animate-pulse bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+                  <div className="w-9 h-9 rounded-full border-3 border-blue-100 border-t-blue-600 animate-spin mb-4" />
+                  <p className="text-xs font-black text-slate-700 tracking-wide">Consultando Base de Datos Civil...</p>
+                  <p className="text-[0.62rem] text-slate-400 font-semibold mt-1">Verificando registros biométricos de la República</p>
+                </div>
+              ) : activeTracking ? (
+                <div className="p-4 bg-white rounded-2xl border border-slate-200/80 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] transition-all hover:shadow-[0_4px_16px_-4px_rgba(0,0,0,0.06)] animate-in fade-in zoom-in-98 duration-200">
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"><FileDigit size={18} /></div>
-                      <div>
-                        <p className="font-bold text-slate-800 text-sm">Cédula de Identidad</p>
-                        <p className="text-xs text-slate-500 font-medium">Folio: CI-2026-8891</p>
+                      <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                        {activeTracking.icon}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="font-extrabold text-slate-800 text-xs md:text-sm truncate">{activeTracking.title}</p>
+                        <p className="text-[0.62rem] text-slate-400 font-bold mt-0.5">Folio: {activeTracking.folio}</p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[0.625rem] font-bold bg-amber-100 text-amber-700 border border-amber-200/50">En fabricación</span>
+                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-[0.6rem] font-black border uppercase tracking-wider ${activeTracking.statusBg}`}>
+                        {activeTracking.status}
+                      </span>
                     </div>
                   </div>
 
                   <div className="mt-4 pt-4 border-t border-slate-100 pl-2">
                     <div className="space-y-4">
-                      <div className="flex gap-3 relative">
-                        <div className="absolute top-6 left-2 w-[2px] h-[calc(100%+8px)] -ml-[1px] bg-blue-600"></div>
-                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-blue-600 text-white relative z-10 ring-4 ring-white">
-                          <Check size={10} strokeWidth={3} />
-                        </div>
-                        <div className="flex-1 -mt-1">
-                          <p className="text-[0.8125rem] font-bold text-slate-800">Solicitud ingresada</p>
-                          <p className="text-[0.6875rem] text-slate-500 mt-0.5">Captura de datos biográficos y biométricos.</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[0.6875rem] font-semibold text-slate-500">09 May</p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 relative">
-                        <div className="absolute top-6 left-2 w-[2px] h-[calc(100%+8px)] -ml-[1px] bg-slate-100"></div>
-                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-blue-600 text-white relative z-10 ring-4 ring-white">
-                          <Check size={10} strokeWidth={3} />
-                        </div>
-                        <div className="flex-1 -mt-1">
-                          <p className="text-[0.8125rem] font-bold text-slate-800">Revisión de antecedentes</p>
-                          <p className="text-[0.6875rem] text-slate-500 mt-0.5">Validación de identidad aprobada.</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[0.6875rem] font-semibold text-slate-500">10 May</p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 relative">
-                        <div className="absolute top-6 left-2 w-[2px] h-[calc(100%+8px)] -ml-[1px] bg-slate-100"></div>
-                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-amber-500 relative z-10 ring-4 ring-white">
-                          <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></div>
-                        </div>
-                        <div className="flex-1 -mt-1">
-                          <p className="text-[0.8125rem] font-bold text-amber-600">En fabricación</p>
-                          <p className="text-[0.6875rem] text-slate-500 mt-0.5">Tu documento se encuentra en proceso de impresión.</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[0.6875rem] font-semibold text-amber-500">En curso</p>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 relative">
-                        <div className="w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center bg-slate-200 relative z-10 ring-4 ring-white">
-                        </div>
-                        <div className="flex-1 -mt-1">
-                          <p className="text-[0.8125rem] font-bold text-slate-400">Listo para retiro</p>
-                          <p className="text-[0.6875rem] text-slate-400 mt-0.5">Estará disponible en la sucursal seleccionada.</p>
-                        </div>
-                        <div className="text-right">
-                          <p className="text-[0.6875rem] font-semibold text-slate-300">-</p>
-                        </div>
-                      </div>
+                      {activeTracking.stages.map((stage, idx) => {
+                        const isCompleted = idx < activeTracking.currentStage;
+                        const isActive = idx === activeTracking.currentStage;
+                        const isPending = idx > activeTracking.currentStage;
+                        return (
+                          <div key={idx} className="flex gap-3.5 relative">
+                            {idx < activeTracking.stages.length - 1 && (
+                              <div className={`absolute top-6 left-2 w-[2px] h-[calc(100%+8px)] -ml-[1px] transition-colors duration-300 ${isCompleted ? 'bg-blue-600' : 'bg-slate-100'}`} />
+                            )}
+                            <div className={`
+                              w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center relative z-10 ring-4 ring-white transition-all duration-300
+                              ${isCompleted ? 'bg-blue-600 text-white' : isActive ? 'bg-amber-500 text-white animate-pulse' : 'bg-slate-200'}
+                            `}>
+                              {isCompleted ? (
+                                <Check size={9} strokeWidth={4} />
+                              ) : isActive ? (
+                                <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+                              ) : null}
+                            </div>
+                            <div className="flex-1 -mt-1.5 text-left">
+                              <p className={`text-[0.78rem] font-bold transition-colors duration-200 ${isActive ? 'text-amber-600' : isPending ? 'text-slate-400' : 'text-slate-800'}`}>
+                                {stage.label}
+                              </p>
+                              <p className="text-[0.66rem] text-slate-500 mt-0.5 leading-relaxed font-medium">
+                                {stage.desc}
+                              </p>
+                              {stage.isDownloadable && isActive && (
+                                <button 
+                                  onClick={() => {
+                                    alert(`Descargando Padrón oficial de Inscripción de Vehículo.\nFolio: ${activeTracking.folio}`);
+                                    const link = document.createElement('a');
+                                    link.href = '#';
+                                    link.setAttribute('download', `Padron_${activeTracking.folio}.pdf`);
+                                    const blob = new Blob(["%PDF-1.4 ... Padrón de Vehículo Motorizado firmado digitalmente por el Registro Civil de Chile ..."], { type: 'application/pdf' });
+                                    link.href = URL.createObjectURL(blob);
+                                    document.body.appendChild(link);
+                                    link.click();
+                                    document.body.removeChild(link);
+                                  }}
+                                  className="mt-2.5 flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[0.62rem] font-extrabold shadow-sm active:scale-95 transition-all cursor-pointer w-fit"
+                                >
+                                  <Download size={11} /> Descargar Padrón (.pdf)
+                                </button>
+                              )}
+                            </div>
+                            <div className="text-right">
+                              <p className={`text-[0.62rem] font-bold ${isActive ? 'text-amber-500 animate-pulse' : isPending ? 'text-slate-300 font-medium' : 'text-slate-400 font-semibold'}`}>
+                                {stage.date}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
                   </div>
                 </div>
-              </div>
+              ) : null}
             </div>
           </div>
         </div>
