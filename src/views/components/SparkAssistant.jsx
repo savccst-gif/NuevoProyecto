@@ -276,7 +276,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
   };
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+    <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end pointer-events-none">
       
       {/* Spark Assistant Panel */}
       <div 
@@ -284,7 +284,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
         className={`
           mb-4 w-96 max-w-[calc(100vw-2rem)] rounded-3xl transition-all duration-300 transform origin-bottom-right
           backdrop-blur-xl overflow-hidden flex flex-col h-[530px]
-          ${isOpen ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-90 pointer-events-none'}
+          ${isOpen ? 'opacity-100 translate-y-0 scale-100 pointer-events-auto' : 'opacity-0 translate-y-8 scale-90 pointer-events-none'}
           ${highContrast 
             ? 'bg-slate-950/95 border border-cyan-500/40 text-white shadow-[0_0_30px_rgba(6,182,212,0.25)]' 
             : 'bg-white/90 border border-slate-200 text-slate-800 shadow-[0_10px_50px_rgba(0,0,0,0.12)]'}
@@ -854,7 +854,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
         onClick={handleSparkInteraction}
         aria-label="Abrir asistente de accesibilidad y ayuda Spark"
         className={`
-          relative flex items-center justify-center w-16 h-16 rounded-full 
+          relative flex items-center justify-center w-16 h-16 rounded-full pointer-events-auto
           backdrop-blur-xl border cursor-pointer transition-all duration-300 hover:scale-110 focus:outline-none
           ${isOpen ? 'ring-4 ring-cyan-500/20' : ''}
           ${highContrast 

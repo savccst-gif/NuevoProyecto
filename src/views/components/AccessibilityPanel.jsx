@@ -10,9 +10,9 @@ export function AccessibilityPanel() {
   const fontIndex = FONT_SIZES.indexOf(fontSize);
 
   return (
-    <div className="fixed left-4 bottom-6 z-50">
+    <div className="fixed left-4 bottom-6 z-50 pointer-events-none">
       {open && (
-        <div className="mb-3 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="mb-3 w-72 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-2 duration-200 pointer-events-auto">
           <div className="flex items-center justify-between px-5 py-3.5 bg-blue-700">
             <div className="flex items-center gap-2.5 text-white">
               <Accessibility size={16} />
@@ -67,7 +67,7 @@ export function AccessibilityPanel() {
           </div>
         </div>
       )}
-      <button onClick={() => setOpen(!open)} className={`relative flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl transition-all duration-200 hover:shadow-2xl active:scale-95 ${open || highContrast || readingMode || fontSize !== 16 ? "bg-blue-700 text-white" : "bg-white text-blue-700 border border-blue-100"}`}>
+      <button onClick={() => setOpen(!open)} className={`relative flex items-center gap-2.5 px-4 py-3 rounded-2xl shadow-xl transition-all duration-200 hover:shadow-2xl active:scale-95 pointer-events-auto ${open || highContrast || readingMode || fontSize !== 16 ? "bg-blue-700 text-white" : "bg-white text-blue-700 border border-blue-100"}`}>
         <Accessibility size={18} />
         <span style={{ fontSize: "0.8rem", fontWeight: 600 }} className="hidden sm:block">Accesibilidad</span>
       </button>
