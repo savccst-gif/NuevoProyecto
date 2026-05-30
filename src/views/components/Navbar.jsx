@@ -20,11 +20,11 @@ export function Navbar({ onLoginClick }) {
   const handleNavClick = (pageId) => {
     setPage(pageId);
     setMenuOpen(false);
-    window.scrollTo({ top: 0, behavior: 'instant' });
+    window.scrollTo(0, 0);
   };
 
   return (
-    <header className="relative w-full bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <header className="w-full bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
       <div className="bg-blue-800 text-white text-[10px] sm:text-xs py-1.5 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-2.5 sm:gap-4">
@@ -95,39 +95,31 @@ export function Navbar({ onLoginClick }) {
             <button onClick={() => setMenuOpen(!menuOpen)} className="md:hidden p-2 text-slate-600">{menuOpen ? <X size={20} /> : <Menu size={20} />}</button>
           </div>
         </div>
-        {/* Menú móvil absoluto con Backdrop de Seguridad */}
+        {/* Menú móvil */}
         {menuOpen && (
-          <>
-            {/* Backdrop para cerrar al hacer clic afuera en móviles */}
-            <div 
-              className="fixed inset-0 bg-slate-900/10 backdrop-blur-[1px] z-40 md:hidden animate-in fade-in duration-200" 
-              onClick={() => setMenuOpen(false)}
-            ></div>
+          <div className="md:hidden py-3 border-t border-slate-100 flex flex-col gap-2 animate-in fade-in duration-200">
+            {links.map((l) => (
+              <button key={l.id} onClick={() => handleNavClick(l.id)} className={`px-4 py-2.5 text-left text-sm font-semibold rounded-xl transition-colors ${currentPage === l.id ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50'}`}>{l.label}</button>
+            ))}
             
-            <div className="absolute top-full left-0 right-0 bg-white border-b border-slate-200 shadow-xl py-4 px-4 flex flex-col gap-2 z-50 md:hidden animate-in fade-in slide-in-from-top-2 duration-200">
-              {links.map((l) => (
-                <button key={l.id} onClick={() => handleNavClick(l.id)} className={`px-4 py-2.5 text-left text-sm font-semibold rounded-xl transition-colors ${currentPage === l.id ? 'bg-blue-50 text-blue-700' : 'text-slate-600 hover:bg-slate-50'}`}>{l.label}</button>
-              ))}
-              
-              {isAuthenticated ? (
-                <div className="px-4 py-3 border-t border-slate-100 flex items-center gap-3 bg-slate-50/50 rounded-2xl mt-1">
-                  <img src={user.photoURL} alt={user.displayName} className="w-8 h-8 rounded-full object-cover border border-slate-200" />
-                  <div className="flex-1 text-left leading-none">
-                    <p className="text-xs font-black text-slate-800 leading-tight">{user.displayName}</p>
-                    <p className="text-[0.62rem] text-slate-400 font-bold mt-1 leading-none">{user.rut}</p>
-                  </div>
-                  <button 
-                    onClick={() => { logout(); setMenuOpen(false); }} 
-                    className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-xs font-black hover:bg-rose-100 transition-colors"
-                  >
-                    Salir
-                  </button>
+            {isAuthenticated ? (
+              <div className="px-4 py-3 border-t border-slate-100 flex items-center gap-3 bg-slate-50/50 rounded-2xl mt-1">
+                <img src={user.photoURL} alt={user.displayName} className="w-8 h-8 rounded-full object-cover border border-slate-200" />
+                <div className="flex-1 text-left leading-none">
+                  <p className="text-xs font-black text-slate-800 leading-tight">{user.displayName}</p>
+                  <p className="text-[0.62rem] text-slate-400 font-bold mt-1 leading-none">{user.rut}</p>
                 </div>
-              ) : (
-                <button onClick={() => { onLoginClick(); setMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors mt-1">Iniciar sesión</button>
-              )}
-            </div>
-          </>
+                <button 
+                  onClick={() => { logout(); setMenuOpen(false); }} 
+                  className="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-xl text-xs font-black hover:bg-rose-100 transition-colors"
+                >
+                  Salir
+                </button>
+              </div>
+            ) : (
+              <button onClick={() => { onLoginClick(); setMenuOpen(false); }} className="px-4 py-2.5 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 rounded-xl transition-colors mt-1">Iniciar sesión</button>
+            )}
+          </div>
         )}
       </div>
     </header>

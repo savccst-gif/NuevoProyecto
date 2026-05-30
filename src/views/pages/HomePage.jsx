@@ -31,7 +31,7 @@ export function HomePage({ onOpenModal }) {
     if (query.trim()) {
       setGlobalSearch(query);
       setPage('tramites');
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      window.scrollTo(0, 0);
     }
   };
 
@@ -149,7 +149,7 @@ export function HomePage({ onOpenModal }) {
           <button
             onClick={() => {
               setPage('tramites');
-              window.scrollTo({ top: 0, behavior: 'instant' });
+              window.scrollTo(0, 0);
             }}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 transition-colors"
           >
