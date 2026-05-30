@@ -31,6 +31,7 @@ export function HomePage({ onOpenModal }) {
     if (query.trim()) {
       setGlobalSearch(query);
       setPage('tramites');
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   };
 
@@ -146,7 +147,10 @@ export function HomePage({ onOpenModal }) {
             <h2 className="text-2xl md:text-3xl font-bold text-slate-800">Trámites frecuentes</h2>
           </div>
           <button
-            onClick={() => setPage('tramites')}
+            onClick={() => {
+              setPage('tramites');
+              window.scrollTo({ top: 0, behavior: 'instant' });
+            }}
             className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1 transition-colors"
           >
             Ver todos <ChevronRight size={16} />

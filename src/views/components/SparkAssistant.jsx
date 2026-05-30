@@ -254,6 +254,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
     } else if (type === 'tramites') {
       setPage('tramites');
       setIsOpen(false);
+      window.scrollTo({ top: 0, behavior: 'instant' });
       const txt = "Te he llevado a la sección de Trámites. Aquí puedes buscar, ingresar tus datos y solicitar cualquier certificado de forma oficial.";
       setChatHistory(prev => [...prev, { sender: 'spark', text: txt }]);
       speakText(txt);
@@ -270,6 +271,7 @@ export default function SparkAssistant({ onOpenModal, onOpenLogin }) {
     } else if (type === 'help') {
       setPage('ayuda');
       setIsOpen(false);
+      window.scrollTo({ top: 0, behavior: 'instant' });
     }
   };
 
