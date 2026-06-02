@@ -1,4 +1,5 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
+import { crearSolicitud, confirmarSolicitudes } from '../services/solicitudesService';
 
 export const AccessibilityContext = createContext(null);
 export const RouterContext = createContext(null);
@@ -57,15 +58,27 @@ export function CartProvider({ children }) {
     { id: "c1", name: "Certificado de Matrimonio (Descarga Lista)", type: "Con vigencia", price: 0, qty: 1, iconBg: "bg-rose-50", iconColor: "text-rose-600" }
   ]);
 
+  // userId del ciudadano logueado — si está seteado, persistimos en Supabase
+  const [currentUserId, setCurrentUserId] = useState(null);
+
   const toggleCart = () => setIsCartOpen(!isCartOpen);
-  const updateQty = (id, delta) => setCartItems((prev) => prev.map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item)).filter((item) => item.qty > 0));
-  
-  const addToCart = (itemData) => {
-    setCartItems(prev => {
-      const uniqueId = itemData.id === 'spark-birth-cert' ? `spark-birth-cert-${Date.now()}` : itemData.id;
-      return [...prev, { ...itemData, id: uniqueId, qty: 1 }];
-    });
+  const updateQty = (id, delta) => setCartItems((prev) =>
+    prev.map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
+        .filter((item) => item.qty > 0)
+  );
+
+  const addToCart = async (itemData, userId = null) => {
+    const activeUserId = userId || currentUserId;
+    const uniqueId = itemData.id === 'spark-birth-cert' ? `spark-birth-cert-${Date.now()}` : itemData.id;
+    const newItem = { ...itemData, id: uniqueId, qty: 1 };
+
+    setCartItems(prev => [...prev, newItem]);
     setIsCartOpen(true);
+
+    // Persistir en Supabase si el usuario está autenticado
+    if (activeUserId) {
+      await crearSolicitud(activeUserId, newItem);
+    }
   };
 
   const addConfirmedItem = (itemData) => {
@@ -74,11 +87,16 @@ export function CartProvider({ children }) {
       return [...prev, { ...itemData, id: uniqueId, qty: 1 }];
     });
   };
-  
-  const confirmCart = () => {
+
+  const confirmCart = async () => {
     setConfirmedItems(prev => [...prev, ...cartItems]);
     setCartItems([]);
     setIsCartOpen(false);
+
+    // Actualizar estado en Supabase si el usuario está autenticado
+    if (currentUserId) {
+      await confirmarSolicitudes(currentUserId);
+    }
   };
 
   const clearCart = () => {
@@ -92,7 +110,8 @@ export function CartProvider({ children }) {
     <CartContext.Provider value={{
       isCartOpen, setIsCartOpen, toggleCart,
       cartItems, updateQty, addToCart, clearCart, totalItems,
-      confirmedItems, addConfirmedItem, confirmCart
+      confirmedItems, addConfirmedItem, confirmCart,
+      setCurrentUserId
     }}>
       {children}
     </CartContext.Provider>

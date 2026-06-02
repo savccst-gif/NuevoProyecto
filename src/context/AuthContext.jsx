@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth, isMockFirebase } from '../config/firebase';
-import { loginWithClaveUnica, logoutClaveUnica } from '../services/authService';
+import { supabase, isMockSupabase } from '../config/supabase';
+import { loginWithClaveUnica, logoutClaveUnica, normalizarUsuario } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -10,31 +9,28 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Si estamos en modo de producción o con llaves reales de Firebase Auth
-    if (!isMockFirebase && auth) {
-      const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
-        if (firebaseUser) {
-          // Generar un RUT estético para el portal a partir de la firma única del UID
-          const hash = firebaseUser.uid.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-          const digits = 12000000 + (hash % 8000000);
-          const rut = `${digits.toLocaleString('es-CL')}-K`;
-          
-          setUser({
-            uid: firebaseUser.uid,
-            displayName: firebaseUser.displayName || "Ciudadano Registrado",
-            email: firebaseUser.email,
-            photoURL: firebaseUser.photoURL || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150",
-            rut: rut,
-            isVerified: true
-          });
+    if (!isMockSupabase && supabase) {
+      // Obtener la sesión activa al cargar la app
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session?.user) {
+          setUser(normalizarUsuario(session.user));
+        }
+        setLoading(false);
+      });
+
+      // Escuchar cambios de sesión en tiempo real (login, logout, token refresh)
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        if (session?.user) {
+          setUser(normalizarUsuario(session.user));
         } else {
           setUser(null);
         }
         setLoading(false);
       });
-      return () => unsubscribe();
+
+      return () => subscription.unsubscribe();
     } else {
-      // Modo Simulado: Restauramos la sesión persistida del LocalStorage
+      // Modo Simulado: restauramos la sesión del LocalStorage
       const savedUser = localStorage.getItem('rc_citizen_session');
       if (savedUser) {
         try {
@@ -51,8 +47,10 @@ export function AuthProvider({ children }) {
     setLoading(true);
     try {
       const loggedUser = await loginWithClaveUnica();
-      setUser(loggedUser);
-      if (isMockFirebase) {
+      // En modo real, el usuario se establece via onAuthStateChange al volver del redirect
+      // En modo mock, lo establecemos directamente
+      if (isMockSupabase) {
+        setUser(loggedUser);
         localStorage.setItem('rc_citizen_session', JSON.stringify(loggedUser));
       }
       return loggedUser;
