@@ -45,7 +45,7 @@ function PortalContent() {
         <SparkAssistant onOpenModal={handleOpenModal} onOpenLogin={() => setLoginOpen(true)} />
         <CarroCertificados />
         
-        {modalOpen && <ModalFormulario type={modalOpen} onClose={handleCloseModal} />}
+        {modalOpen && <ModalFormulario type={modalOpen} onClose={handleCloseModal} onOpenLogin={() => { handleCloseModal(); setLoginOpen(true); }} />}
         {loginOpen && <LoginModal onClose={() => setLoginOpen(false)} onSubmit={() => {}} />}
 
       </div>

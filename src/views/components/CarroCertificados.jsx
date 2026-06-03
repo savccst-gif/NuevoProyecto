@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { ShoppingCart, FileText, X, CreditCard, Download, Calendar, CheckCircle } from 'lucide-react';
 import { CartContext } from '../../context/AppContexts';
+import { imprimirComprobante } from '../../services/comprobanteService';
 
 export function CarroCertificados() {
   const { 
@@ -177,6 +178,9 @@ export function CarroCertificados() {
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="text-slate-700 truncate text-[0.78rem] font-bold">{item.name}</p>
+                        {item.date && (
+                          <p className="text-slate-500 text-[0.65rem] font-semibold mt-0.5">{item.date}</p>
+                        )}
                         <span className={`inline-block px-2 py-0.5 rounded-full text-[0.6rem] font-extrabold mt-1 ${isAppointment ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700'}`}>
                           {item.type}
                         </span>
@@ -184,7 +188,7 @@ export function CarroCertificados() {
                       
                       {isAppointment ? (
                         <button 
-                          onClick={() => alert(`Comprobante de Cita oficial:\n${item.name}\nCódigo de atención: AG-${item.id.toUpperCase()}`)}
+                          onClick={() => imprimirComprobante(item)}
                           className="px-2.5 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[0.68rem] font-extrabold transition-all cursor-pointer flex items-center gap-1"
                         >
                           Comprobante

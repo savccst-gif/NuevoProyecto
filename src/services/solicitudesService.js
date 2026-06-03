@@ -5,16 +5,21 @@ import { supabase, isMockSupabase } from '../config/supabase';
  * @param {string} userId - ID del usuario autenticado
  * @param {object} tramite - Datos del trámite a guardar
  */
-export const crearSolicitud = async (userId, tramite) => {
+export const crearSolicitud = async (userId, tramite, estado = 'pendiente') => {
   if (isMockSupabase || !supabase || !userId) return null;
+
+  let tramiteTipo = tramite.type || 'Gratuito';
+  if (tramite.selectedDate && tramite.selectedTime) {
+    tramiteTipo = `${tramite.type} | ${tramite.selectedDate} | ${tramite.selectedTime} | ${tramite.comuna || ''} | ${tramite.rut || ''} | ${tramite.email || ''}`;
+  }
 
   const { data, error } = await supabase
     .from('solicitudes')
     .insert({
       user_id: userId,
       tramite_nombre: tramite.name,
-      tramite_tipo: tramite.type || 'Gratuito',
-      estado: 'pendiente',
+      tramite_tipo: tramiteTipo,
+      estado: estado,
       precio: tramite.price || 0
     })
     .select()

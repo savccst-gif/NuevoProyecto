@@ -1,5 +1,7 @@
 import React, { useState, useEffect, createContext, useContext } from 'react';
-import { crearSolicitud, confirmarSolicitudes } from '../services/solicitudesService';
+import { crearSolicitud, confirmarSolicitudes, getSolicitudesUsuario } from '../services/solicitudesService';
+import { useAuth } from './AuthContext';
+import { isMockSupabase } from '../config/supabase';
 
 export const AccessibilityContext = createContext(null);
 export const RouterContext = createContext(null);
@@ -50,25 +52,85 @@ export function useAccessibility() {
 }
 
 export function CartProvider({ children }) {
+  const { user } = useAuth();
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [cartItems, setCartItems] = useState([
-    { id: "1", name: "Certificado de Nacimiento (Solicitado)", type: "Para todo trámite", price: 0, qty: 1, iconBg: "bg-blue-50", iconColor: "text-blue-600" }
-  ]);
-  const [confirmedItems, setConfirmedItems] = useState([
-    { id: "c1", name: "Certificado de Matrimonio (Descarga Lista)", type: "Con vigencia", price: 0, qty: 1, iconBg: "bg-rose-50", iconColor: "text-rose-600" }
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+  const [confirmedItems, setConfirmedItems] = useState([]);
 
-  // userId del ciudadano logueado — si está seteado, persistimos en Supabase
-  const [currentUserId, setCurrentUserId] = useState(null);
+  // Helper to map DB row to frontend item
+  const mapDBRowToItem = (row) => {
+    const parts = row.tramite_tipo.split(' | ');
+    const type = parts[0];
+    
+    if (type === 'Visita Agendada') {
+      return {
+        id: row.id,
+        name: row.tramite_nombre,
+        type: type,
+        price: row.precio,
+        iconBg: "bg-amber-50",
+        iconColor: "text-amber-600",
+        date: parts[1] ? `Fecha: ${parts[1]} a las ${parts[2]} hrs` : null,
+        selectedDate: parts[1] || null,
+        selectedTime: parts[2] || null,
+        comuna: parts[3] || null,
+        rut: parts[4] || null,
+        email: parts[5] || null
+      };
+    } else {
+      return {
+        id: row.id,
+        name: row.tramite_nombre,
+        type: type,
+        price: row.precio,
+        iconBg: type === "Reimpresión" ? "bg-blue-50" : "bg-emerald-50",
+        iconColor: type === "Reimpresión" ? "text-blue-600" : "text-emerald-600"
+      };
+    }
+  };
+
+  // Sync with Supabase on user session change
+  useEffect(() => {
+    const cargarSolicitudesDb = async () => {
+      if (!isMockSupabase && user?.id) {
+        try {
+          const solicitudes = await getSolicitudesUsuario(user.id);
+          const cart = [];
+          const confirmed = [];
+          
+          solicitudes.forEach(row => {
+            const item = mapDBRowToItem(row);
+            if (row.estado === 'confirmado') {
+              confirmed.push(item);
+            } else {
+              cart.push(item);
+            }
+          });
+          
+          setCartItems(cart);
+          setConfirmedItems(confirmed);
+        } catch (err) {
+          console.error("Error al cargar solicitudes de la base de datos:", err);
+        }
+      } else if (!user) {
+        // Limpiar el carro cuando se cierra sesión
+        setCartItems([]);
+        setConfirmedItems([]);
+      }
+    };
+    
+    cargarSolicitudesDb();
+  }, [user]);
 
   const toggleCart = () => setIsCartOpen(!isCartOpen);
+  
   const updateQty = (id, delta) => setCartItems((prev) =>
     prev.map((item) => (item.id === id ? { ...item, qty: item.qty + delta } : item))
         .filter((item) => item.qty > 0)
   );
 
-  const addToCart = async (itemData, userId = null) => {
-    const activeUserId = userId || currentUserId;
+  const addToCart = async (itemData) => {
+    const activeUserId = user?.id || null;
     const uniqueId = itemData.id === 'spark-birth-cert' ? `spark-birth-cert-${Date.now()}` : itemData.id;
     const newItem = { ...itemData, id: uniqueId, qty: 1 };
 
@@ -76,16 +138,22 @@ export function CartProvider({ children }) {
     setIsCartOpen(true);
 
     // Persistir en Supabase si el usuario está autenticado
-    if (activeUserId) {
-      await crearSolicitud(activeUserId, newItem);
+    if (!isMockSupabase && activeUserId) {
+      await crearSolicitud(activeUserId, newItem, 'pendiente');
     }
   };
 
-  const addConfirmedItem = (itemData) => {
-    setConfirmedItems(prev => {
-      const uniqueId = Math.random().toString(36).substr(2, 9);
-      return [...prev, { ...itemData, id: uniqueId, qty: 1 }];
-    });
+  const addConfirmedItem = async (itemData) => {
+    const activeUserId = user?.id || null;
+    const uniqueId = Math.random().toString(36).substr(2, 9);
+    const newItem = { ...itemData, id: uniqueId, qty: 1 };
+    
+    setConfirmedItems(prev => [...prev, newItem]);
+    
+    // Si hay sesión iniciada, guardamos en la base de datos como "confirmado" inmediatamente
+    if (!isMockSupabase && activeUserId) {
+      await crearSolicitud(activeUserId, newItem, 'confirmado');
+    }
   };
 
   const confirmCart = async () => {
@@ -94,8 +162,8 @@ export function CartProvider({ children }) {
     setIsCartOpen(false);
 
     // Actualizar estado en Supabase si el usuario está autenticado
-    if (currentUserId) {
-      await confirmarSolicitudes(currentUserId);
+    if (!isMockSupabase && user?.id) {
+      await confirmarSolicitudes(user.id);
     }
   };
 
@@ -111,7 +179,7 @@ export function CartProvider({ children }) {
       isCartOpen, setIsCartOpen, toggleCart,
       cartItems, updateQty, addToCart, clearCart, totalItems,
       confirmedItems, addConfirmedItem, confirmCart,
-      setCurrentUserId
+      setCurrentUserId: () => {}
     }}>
       {children}
     </CartContext.Provider>
